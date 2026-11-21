@@ -192,7 +192,7 @@ export default function GameRoom({ visible, onClose }: { visible: boolean; onClo
             )}
           </View>
           <T size={12} muted style={{ textAlign: 'center', marginTop: 10 }}>
-            Тоглоом хөгжүүлэгч болох замын жижиг алхам ✦ React Native + Accelerometer
+            Миний бүтээсэн анхны тоглоом ✦ React Native + Accelerometer
           </T>
         </View>
       </Background>

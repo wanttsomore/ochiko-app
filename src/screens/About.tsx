@@ -9,11 +9,12 @@ import { profile, skills, Skill } from '../data/profile';
 
 // Тоглоом шиг "түвшин"-ээр илэрхийлсэн замнал
 const JOURNEY = [
-  { lv: 1, title: 'Анхны HTML хуудас', text: '"Hello World" — бүх зүйл эндээс эхэлсэн.' },
-  { lv: 2, title: 'CSS-ээр амилуулсан', text: 'Өнгө, байрлал, анимэйшнд дурласан.' },
-  { lv: 3, title: 'JavaScript тоглоом', text: 'Анхны game loop-оо бичсэн.' },
-  { lv: 4, title: 'C# ба Unity', text: 'Жинхэнэ тоглоомын хөдөлгүүртэй танилцсан.' },
-  { lv: 5, title: 'React Native апп', text: 'Яг одоо — энэ апп!' },
+  { lv: '1', title: 'СЭЗИС · Мэдээллийн систем', text: 'Программчлалын ертөнцөд хөл тавьсан.' },
+  { lv: '2', title: 'HTML & CSS', text: '"Hello World" — анхны хуудсаа амилуулсан.' },
+  { lv: '3', title: 'JavaScript', text: 'Логик, интерактив зүйл бичиж эхэлсэн.' },
+  { lv: '4', title: 'C# — тоглоомын хэл', text: 'Тоглоом хийх зорилгоор сурч байна.' },
+  { lv: '5', title: 'React Native + Orb Rush', text: 'Яг одоо — анхны апп, анхны тоглоом!' },
+  { lv: '?', title: 'Мөрөөдлийн тоглоом', text: '🔒 Удахгүй нээгдэнэ…' },
 ];
 
 export default function About() {
@@ -26,6 +27,7 @@ export default function About() {
         <T size={15} style={{ lineHeight: 23 }}>{profile.bio}</T>
         <View style={[styles.infoRow, { borderTopColor: theme.border }]}>
           <Info icon="school-outline" label={profile.school} />
+          <Info icon="briefcase-outline" label={`Мэргэжил: ${profile.major}`} />
           <Info icon="id-card-outline" label={`Оюутны код: ${profile.studentId}`} />
         </View>
         <View style={styles.chips}>
@@ -41,12 +43,13 @@ export default function About() {
       <T size={18} weight="700" style={{ marginTop: 26, marginBottom: 12 }}>Замнал · Level map</T>
       <Glass>
         {JOURNEY.map((j, i) => {
-          const current = i === JOURNEY.length - 1;
+          const current = i === JOURNEY.length - 2;
+          const locked = i === JOURNEY.length - 1;
           return (
-            <View key={j.lv} style={styles.level}>
+            <View key={j.lv} style={[styles.level, locked && { opacity: 0.5 }]}>
               <View style={{ alignItems: 'center', width: 44 }}>
                 <View style={[styles.lvBadge, { backgroundColor: current ? theme.accent : theme.glassStrong, borderColor: theme.border }]}>
-                  <T size={12} weight="800" color={current ? '#fff' : undefined}>Lv{j.lv}</T>
+                  <T size={12} weight="800" color={current ? '#fff' : undefined}>{locked ? '🔒' : `Lv${j.lv}`}</T>
                 </View>
                 {i < JOURNEY.length - 1 && <View style={[styles.line, { backgroundColor: theme.border }]} />}
               </View>

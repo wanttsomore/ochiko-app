@@ -47,7 +47,7 @@ export default function Home({ go, openGame }: Props) {
       {/* Танилцуулга карт: нэр, чиглэл, нэг өгүүлбэр */}
       <Glass strong style={{ marginBottom: 14 }}>
         <View style={styles.rowBetween}>
-          <Pill label="Online · Сурч байна" dot />
+          <Pill label="4-р курс · Online" dot />
           <T size={12} muted>ID {profile.studentId}</T>
         </View>
         <T size={34} weight="800" style={{ marginTop: 16 }}>{profile.name}</T>
@@ -57,7 +57,7 @@ export default function Home({ go, openGame }: Props) {
         <View style={[styles.stats, { borderTopColor: theme.border }]}>
           <Stat value={`${skills.length}`} label="Skills" />
           <Stat value={`${projects.length}`} label="Projects" />
-          <Stat value="∞" label="Ideas" />
+          <Stat value="1" label="Game 🎮" />
         </View>
       </Glass>
 

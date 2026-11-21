@@ -67,7 +67,7 @@ function Root() {
   const screens = [
     <Home key="h" go={go} openGame={() => setGame(true)} />,
     <About key="a" />,
-    <Projects key="p" />,
+    <Projects key="p" openGame={() => setGame(true)} />,
     <Contact key="c" />,
   ];
 

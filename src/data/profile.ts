@@ -10,15 +10,17 @@ export const profile = {
   name: 'Д.Очиржанцан',
   nickname: 'Ochiko',
   studentId: 'B23FA1235',
-  role: 'Game Developer · Student',
+  role: 'Aspiring Game Developer',
   // Нүүр дэлгэцийн нэг өгүүлбэр
-  tagline: 'Код бичих бүрдээ шинэ ертөнц бүтээж, тоглогчдод мартагдашгүй мөч бэлэглэхийг зорьдог.',
-  school: 'СЭЗИС · Мэдээллийн системийн менежмент',
+  tagline: 'Өөрийн тоглоомоо бүтээхийг мөрөөддөг — анхны алхмаа яг энэ апп дотор хийлээ.',
+  school: 'Санхүү Эдийн Засгийн Их Сургууль · 4-р курс',
+  major: 'Мэдээллийн систем',
   bio:
-    'Сайн байна уу! Би Очиржанцан. Хүүхэд байхаасаа тоглоом тоглохдоо "энэ яаж хийгддэг юм бол?" ' +
-    'гэж боддог байсан нь намайг программчлал руу хөтөлсөн. Одоо вэб, мобайл, C# дээр суралцаж, ' +
-    'ирээдүйд өөрийн гэсэн тоглоомоо гаргахыг зорьж байна.',
-  interests: ['Тоглоом хөгжүүлэлт', 'Game design', 'Unity', 'UI/UX'],
+    'Сайн байна уу! Би Очиржанцан, СЭЗИС-ийн Мэдээллийн систем мэргэжлийн 4-р курсийн оюутан. ' +
+    'Тоглоом тоглохдоо "энэ яаж хийгддэг юм бол?" гэж үргэлж боддог байсан. Тэгээд нэг өдөр ' +
+    'өөрийн тоглоомоо бүтээнэ гэж мөрөөддөг болсон. Одоогоор HTML, CSS, JavaScript, C#, React Native сурч, ' +
+    'тэр мөрөөдөл рүүгээ алхам алхмаар ойртож байна.',
+  interests: ['Тоглоом хөгжүүлэлт', 'Game design', 'Тоглоом тоглох', 'UI/UX'],
 };
 
 export type Skill = {
@@ -32,7 +34,7 @@ export const skills: Skill[] = [
   { name: 'HTML', icon: 'logo-html5', level: 80, note: 'Бүтэцтэй, семантик хуудас' },
   { name: 'CSS', icon: 'logo-css3', level: 70, note: 'Flexbox, Grid, анимэйшн' },
   { name: 'JavaScript', icon: 'logo-javascript', level: 65, note: 'DOM, Canvas, ES6+' },
-  { name: 'C#', icon: 'code-slash', level: 55, note: 'OOP, Unity скрипт' },
+  { name: 'C#', icon: 'code-slash', level: 50, note: 'OOP — тоглоомын хэл, сурч байна' },
   { name: 'React Native', icon: 'logo-react', level: 50, note: 'Expo, Animated, Sensors' },
 ];
 
@@ -45,62 +47,67 @@ export type Project = {
   description: string;
   image: ImageSourcePropType;
   link: string;
-  status: 'Live' | 'Building' | 'Done';
+  status: 'Live' | 'Building' | 'Done' | 'Locked';
+  action?: 'game'; // 'game' бол холбоос биш, апп доторх тоглоомыг нээнэ
 };
 
-// TODO: Өөрийн жинхэнэ бүтээлүүд, зураг (assets/projects/) болон холбоосоор солино уу.
+// Хамгийн багадаа 3 бүтээл. Хичээлийн төсөл байж болно.
+// TODO: 3-р бүтээлийг өөрийн хийсэн хичээлийн төсөл, зураг (assets/projects/p3.jpg), холбоосоор солиорой.
 export const projects: Project[] = [
   {
     id: 'p1',
-    title: 'Space Dodger',
-    tag: 'Game Room',
-    stack: ['C#', 'Unity', '2D'],
-    short: 'Солир тойрон нисдэг 2D тоглоом',
+    title: 'Orb Rush',
+    tag: 'Анхны тоглоом',
+    stack: ['React Native', 'Accelerometer', 'Game loop'],
+    short: 'Миний бүтээсэн хамгийн анхны тоглоом 🎮',
     description:
-      'Сансрын хөлгөө удирдан солируудаас зугтаж оноо цуглуулдаг 2D тоглоом. ' +
-      'C# дээр тоглогчийн хөдөлгөөн, мөргөлдөөн шалгах, оноо тоолох системийг бичсэн.',
+      'Тоглоом хийхийг мөрөөддөг надад энэ бол анхны жинхэнэ алхам. Утсаа хазайлгаж бөмбөгөө ' +
+      'удирдаад орб цуглуулж, bug-аас зайлсхийнэ. Game loop (requestAnimationFrame), мөргөлдөөн ' +
+      'шалгах, физик (хурд, үрэлт, хананаас ойх), оноо, рекордыг өөрөө бичсэн. Апп дотор нууцаар байрладаг!',
     image: require('../../assets/projects/p1.jpg'),
     link: 'https://github.com/', // TODO
-    status: 'Building',
+    status: 'Live',
+    action: 'game',
   },
   {
     id: 'p2',
-    title: 'Snake.js',
-    tag: 'Arcade',
-    stack: ['JavaScript', 'Canvas', 'HTML'],
-    short: 'Хөтөч дээр тоглодог сонгодог могой',
+    title: 'Ochiko OS',
+    tag: 'Mobile',
+    stack: ['React Native', 'Expo', 'Sensors', 'Haptics'],
+    short: 'Яг одоо үзэж буй энэ портфолио апп',
     description:
-      'HTML Canvas болон цэвэр JavaScript ашиглан хийсэн сонгодог Snake тоглоом. ' +
-      'Game loop, гарын товчлуурын удирдлага, оноо хадгалах (localStorage) хэрэгжүүлсэн.',
-    image: require('../../assets/projects/p2.jpg'),
-    link: 'https://github.com/', // TODO
-    status: 'Done',
+      'Ухаалаг гэрийн удирдлагын самбар хэлбэртэй портфолио апп. Хазайлтын мэдрэгчээр parallax, ' +
+      'сэгсрэх үйлдлээр нууц өрөө, haptic чичиргээ, swipe gesture, dark/light горим ашигласан.',
+    image: require('../../assets/projects/p4.jpg'),
+    link: 'https://github.com/', // TODO: энэ репогийн холбоос
+    status: 'Live',
   },
   {
     id: 'p3',
-    title: 'Хувийн вэбсайт',
+    title: 'Хичээлийн вэб төсөл',
     tag: 'Web',
     stack: ['HTML', 'CSS', 'JavaScript'],
-    short: 'Анхны responsive портфолио сайт',
+    short: 'TODO: өөрийн хичээлийн төслөөр солих',
     description:
-      'HTML, CSS, JavaScript-ээр хийсэн анхны хувийн вэбсайт. ' +
-      'Утас, компьютер дээр зөв харагдах responsive загвар, dark mode товч оруулсан.',
+      'TODO: Энд хичээл дээр хийсэн HTML/CSS/JavaScript төслөө товч тайлбарлана — юу хийдэг, ' +
+      'ямар асуудал шийддэг, та ямар хэсгийг нь хийсэн бэ.',
     image: require('../../assets/projects/p3.jpg'),
     link: 'https://github.com/', // TODO
     status: 'Done',
   },
   {
     id: 'p4',
-    title: 'Ochiko OS',
-    tag: 'Mobile',
-    stack: ['React Native', 'Expo', 'Sensors'],
-    short: 'Яг одоо үзэж буй энэ апп',
+    title: 'Мөрөөдлийн тоглоом',
+    tag: 'Coming soon',
+    stack: ['C#', 'Unity', 'Game design'],
+    short: 'Хараахан түгжээтэй түвшин 🔒',
     description:
-      'Ухаалаг гэрийн удирдлагын самбар хэлбэртэй портфолио апп. ' +
-      'Хазайлтын мэдрэгч, сэгсрэх үйлдэл, haptic чичиргээ, swipe gesture ашигласан.',
-    image: require('../../assets/projects/p4.jpg'),
-    link: 'https://github.com/', // TODO: энэ репогийн холбоос
-    status: 'Live',
+      'Энэ бол миний хамгийн том мөрөөдөл — өөрийн гэсэн тоглоом. C# сурч, Unity хөдөлгүүртэй ' +
+      'танилцаж байгаа бөгөөд энэ түвшин удахгүй нээгдэнэ. Хамтран ажиллах, зөвлөгөө өгөх хүсэлтэй ' +
+      'бол надтай холбогдоорой!',
+    image: require('../../assets/projects/p2.jpg'),
+    link: 'mailto:b23fa1235@ufe.edu.mn',
+    status: 'Locked',
   },
 ];
 

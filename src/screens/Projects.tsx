@@ -9,7 +9,7 @@ import { Glass, IconCircle, Pill, SectionTitle, SwipeButton, T, tap } from '../c
 import { useTheme } from '../theme';
 import { projects, Project } from '../data/profile';
 
-export default function Projects() {
+export default function Projects({ openGame }: { openGame: () => void }) {
   const { theme } = useTheme();
   const { width } = useWindowDimensions();
   const cardW = Math.min(width, 520) - 40; // дэлгэцийн өргөнөөс хамаарч карт томорно/жижгэрнэ
@@ -50,7 +50,7 @@ export default function Projects() {
           const scale = scrollX.interpolate({ inputRange: input, outputRange: [0.92, 1, 0.92], extrapolate: 'clamp' });
           return (
             <Animated.View style={{ width: cardW, transform: [{ scale }] }}>
-              <CamCard p={item} cam={i + 1} h={cardW * 1.15} onPress={() => setOpen(item)} />
+              <CamCard p={item} cam={i + 1} h={cardW * 0.9} onPress={() => setOpen(item)} />
             </Animated.View>
           );
         }}
@@ -76,7 +76,7 @@ export default function Projects() {
         ))}
       </View>
 
-      <ProjectSheet p={open} onClose={() => setOpen(null)} />
+      <ProjectSheet p={open} onClose={() => setOpen(null)} onPlay={() => { setOpen(null); setTimeout(openGame, 350); }} />
     </View>
   );
 }
@@ -87,7 +87,7 @@ function CamCard({ p, cam, h, onPress }: { p: Project; cam: number; h: number; o
       <Image source={p.image} style={StyleSheet.absoluteFill} resizeMode="cover" />
       <View style={styles.camTop}>
         <T size={12} weight="700" color="#fff">Cam{cam} · {p.tag}</T>
-        <View style={styles.liveForce}><Pill label={p.status} dot={p.status === 'Live'} /></View>
+        <Pill label={p.status === 'Locked' ? 'Locked' : p.status} icon={p.status === 'Locked' ? 'lock-closed' : undefined} dot={p.status === 'Live'} />
       </View>
       <View style={styles.camBottom}>
         <View style={{ flex: 1 }}>
@@ -102,7 +102,7 @@ function CamCard({ p, cam, h, onPress }: { p: Project; cam: number; h: number; o
   );
 }
 
-function ProjectSheet({ p, onClose }: { p: Project | null; onClose: () => void }) {
+function ProjectSheet({ p, onClose, onPlay }: { p: Project | null; onClose: () => void; onPlay: () => void }) {
   const { theme } = useTheme();
   const { width } = useWindowDimensions();
   const imgH = (Math.min(width, 560) - 40) / 1.5; // 3:2 харьцаа
@@ -125,7 +125,13 @@ function ProjectSheet({ p, onClose }: { p: Project | null; onClose: () => void }
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 22 }}>
               {p.stack.map((s) => <Pill key={s} label={s} icon="code-slash" />)}
             </View>
-            <SwipeButton label="Төслийг нээх" icon="open-outline" onComplete={() => Linking.openURL(p.link)} />
+            {p.action === 'game' ? (
+              <SwipeButton label="Гулсуулж тоглох" icon="game-controller" onComplete={onPlay} />
+            ) : p.status === 'Locked' ? (
+              <SwipeButton label="Зөвлөгөө өгөх" icon="mail" onComplete={() => Linking.openURL(p.link)} />
+            ) : (
+              <SwipeButton label="Төслийг нээх" icon="open-outline" onComplete={() => Linking.openURL(p.link)} />
+            )}
             <View style={{ height: 20 }} />
           </ScrollView>
         </View>
@@ -138,7 +144,6 @@ const styles = StyleSheet.create({
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   cam: { borderRadius: 28, overflow: 'hidden', backgroundColor: '#222', justifyContent: 'space-between' },
   camTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16 },
-  liveForce: {},
   camBottom: {
     flexDirection: 'row', alignItems: 'center', margin: 12, padding: 14, borderRadius: 22,
     backgroundColor: 'rgba(30,30,32,0.62)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
