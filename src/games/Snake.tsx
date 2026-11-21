@@ -1,11 +1,11 @@
 // Тоглоом 3 — Snake
-// Дэлгэц дээр хуруугаа дээш/доош/зүүн/баруун гүйлгэж (swipe) могойгоо эргүүлнэ.
+// Сум товч эсвэл дэлгэц дээр хуруугаа гүйлгэж (swipe) могойгоо эргүүлнэ.
 // Хоол идэх бүрт урт нь нэмэгдэж, хурдасна. Хана эсвэл өөрийгөө мөргөвөл тоглоом дуусна.
 import React, { useEffect, useRef, useState } from 'react';
 import { PanResponder, StyleSheet, View } from 'react-native';
 import { success, thud, tap } from '../components/ui';
 import { useTheme } from '../theme';
-import { Arena, HUD, Overlay, Phase, useArena } from './GameFrame';
+import { Arena, Controls, HUD, Overlay, Phase, useArena } from './GameFrame';
 
 const COLS = 14;
 type Cell = { x: number; y: number };
@@ -115,8 +115,9 @@ export default function Snake({ onFinish }: { onFinish?: (score: number) => void
           </View>
         )}
         <Overlay phase={phase} icon="git-commit" score={score.current} best={best} onStart={start}
-          intro="Хуруугаа дэлгэц дээр дээш, доош, зүүн, баруун гүйлгэж могойгоо эргүүл. Шар хоол идэх тусам урт, хурдан болно." />
+          intro="Доорх сум товчоор (эсвэл дэлгэц дээр хуруугаа гүйлгэж) могойгоо эргүүл. Шар хоол идэх тусам урт, хурдан болно." />
       </Arena>
+      <Controls mode="dpad" onDown={(d) => turn(d)} />
     </>
   );
 }

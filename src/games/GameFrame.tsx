@@ -121,6 +121,49 @@ export function Overlay({ phase, icon, intro, score, best, onStart }: {
   );
 }
 
+// ---------- Удирдлагын товчнууд ----------
+export type Dir = 'up' | 'down' | 'left' | 'right';
+const ICON: Record<Dir, any> = { up: 'chevron-up', down: 'chevron-down', left: 'chevron-back', right: 'chevron-forward' };
+
+function PadButton({ dir, onDown, onUp }: { dir: Dir; onDown: (d: Dir) => void; onUp?: (d: Dir) => void }) {
+  const { theme } = useTheme();
+  const s = useRef(new Animated.Value(1)).current;
+  return (
+    <Pressable
+      hitSlop={6}
+      onPressIn={() => { tap(); onDown(dir); Animated.spring(s, { toValue: 0.88, useNativeDriver: true }).start(); }}
+      onPressOut={() => { onUp?.(dir); Animated.spring(s, { toValue: 1, friction: 4, useNativeDriver: true }).start(); }}
+    >
+      <Animated.View style={[styles.pad, { backgroundColor: theme.glassStrong, borderColor: theme.border, transform: [{ scale: s }] }]}>
+        <Ionicons name={ICON[dir]} size={28} color={theme.text} />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+// 4 чиглэлтэй (D-pad) эсвэл зүүн/баруун 2 товч. onDown — дарахад, onUp — тавихад.
+export function Controls({ mode, onDown, onUp }: { mode: 'dpad' | 'lr'; onDown: (d: Dir) => void; onUp?: (d: Dir) => void }) {
+  if (mode === 'lr') {
+    return (
+      <View style={styles.controls}>
+        <PadButton dir="left" onDown={onDown} onUp={onUp} />
+        <View style={{ width: 90 }} />
+        <PadButton dir="right" onDown={onDown} onUp={onUp} />
+      </View>
+    );
+  }
+  return (
+    <View style={[styles.controls, { flexDirection: 'column' }]}>
+      <PadButton dir="up" onDown={onDown} onUp={onUp} />
+      <View style={{ flexDirection: 'row', gap: 66 }}>
+        <PadButton dir="left" onDown={onDown} onUp={onUp} />
+        <PadButton dir="right" onDown={onDown} onUp={onUp} />
+      </View>
+      <PadButton dir="down" onDown={onDown} onUp={onUp} />
+    </View>
+  );
+}
+
 export const dist = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y);
 
 const styles = StyleSheet.create({
@@ -130,5 +173,7 @@ const styles = StyleSheet.create({
   hudItem: { flex: 1, paddingVertical: 10, alignItems: 'center' },
   arena: { flex: 1, borderRadius: 30, borderWidth: 1, overflow: 'hidden' },
   overlay: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: 'rgba(0,0,0,0.35)' },
+  controls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 12 },
+  pad: { width: 60, height: 60, borderRadius: 30, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   play: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 26, height: 52, borderRadius: 26, marginTop: 20 },
 });

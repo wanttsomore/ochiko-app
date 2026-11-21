@@ -7,7 +7,7 @@ import { Accelerometer } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { success, thud, tap } from '../components/ui';
 import { useTheme } from '../theme';
-import { Arena, HUD, Overlay, Phase, dist, useArena } from './GameFrame';
+import { Arena, Controls, HUD, Overlay, Phase, dist, useArena } from './GameFrame';
 
 const SHIP = 22;
 const LIVES = 3;
@@ -27,6 +27,7 @@ export default function SpaceDodger({ onFinish }: { onFinish?: (score: number) =
   const stars = useRef<Star[]>([]);
   const tiltX = useRef(0);
   const touchX = useRef<number | null>(null);
+  const holdX = useRef(0); // товчоор удирдах: -1 зүүн, 1 баруун
   const score = useRef(0);
   const lives = useRef(LIVES);
   const elapsed = useRef(0);
@@ -68,7 +69,8 @@ export default function SpaceDodger({ onFinish }: { onFinish?: (score: number) =
       const speed = 1 + elapsed.current / 15; // хүндрэл: 15 секунд тутам 1 дахин хурдасна
 
       // 1) Хөлөг: хазайлт эсвэл хурууны байрлал руу
-      if (touchX.current !== null) shipV.current = (touchX.current - shipX.current) * 0.25;
+      if (holdX.current) shipV.current = holdX.current * 7;
+      else if (touchX.current !== null) shipV.current = (touchX.current - shipX.current) * 0.25;
       else shipV.current = shipV.current * 0.85 + tiltX.current * 3.2;
       shipX.current = Math.max(SHIP, Math.min(w - SHIP, shipX.current + shipV.current));
 
@@ -136,8 +138,9 @@ export default function SpaceDodger({ onFinish }: { onFinish?: (score: number) =
           </>
         )}
         <Overlay phase={phase} icon="rocket" score={score.current} best={best} onStart={start}
-          intro="Утсаа зүүн/баруун тийш хазайлгаж (эсвэл хуруугаараа чирж) хөлгөө удирд. Солир бүрийг давахад +1 оноо. 3 амьтай!" />
+          intro="Сум товч, утсаа хазайлгах эсвэл хуруугаараа чирж хөлгөө удирд. Солир бүрийг давахад +1 оноо. 3 амьтай!" />
       </Arena>
+      <Controls mode="lr" onDown={(d) => { holdX.current = d === 'left' ? -1 : 1; }} onUp={() => { holdX.current = 0; }} />
     </>
   );
 }

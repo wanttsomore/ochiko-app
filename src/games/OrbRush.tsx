@@ -6,7 +6,7 @@ import { PanResponder, Platform, View, StyleSheet } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 import { success, thud } from '../components/ui';
 import { useTheme } from '../theme';
-import { Arena, HUD, Overlay, Phase, dist, useArena } from './GameFrame';
+import { Arena, Controls, Dir, HUD, Overlay, Phase, dist, useArena } from './GameFrame';
 
 const BALL = 18, ORB = 13, BUG = 16, TIME = 20;
 type Vec = { x: number; y: number };
@@ -25,6 +25,7 @@ export default function OrbRush({ onFinish }: { onFinish?: (score: number) => vo
   const bugVel = useRef<Vec>({ x: 2.2, y: 1.7 });
   const accel = useRef<Vec>({ x: 0, y: 0 });
   const touch = useRef<Vec | null>(null);
+  const hold = useRef<Vec>({ x: 0, y: 0 }); // сум товчоор удирдах
   const score = useRef(0);
   const timeLeft = useRef(TIME);
   const hurtUntil = useRef(0);
@@ -65,7 +66,8 @@ export default function OrbRush({ onFinish }: { onFinish?: (score: number) => vo
 
       // 1) Хүч → хурд → байрлал (үрэлт 0.95)
       let fx = accel.current.x, fy = accel.current.y;
-      if (touch.current) { fx = (touch.current.x - ball.current.x) / 60; fy = (touch.current.y - ball.current.y) / 60; }
+      if (hold.current.x || hold.current.y) { fx = hold.current.x * 0.9; fy = hold.current.y * 0.9; }
+      else if (touch.current) { fx = (touch.current.x - ball.current.x) / 60; fy = (touch.current.y - ball.current.y) / 60; }
       vel.current.x = (vel.current.x + fx * 1.1) * 0.95;
       vel.current.y = (vel.current.y + fy * 1.1) * 0.95;
       ball.current.x += vel.current.x;
@@ -129,8 +131,11 @@ export default function OrbRush({ onFinish }: { onFinish?: (score: number) => vo
           </>
         )}
         <Overlay phase={phase} icon="radio-button-on" score={score.current} best={best} onStart={start}
-          intro="Утсаа хазайлгаж цагаан бөмбөгөө удирд (эсвэл хуруугаараа чир). Улбар шар орб цуглуулж, улаан хорхойноос зайлсхий. 20 секунд!" />
+          intro="Утсаа хазайлгах, сум товч эсвэл хуруугаараа чирж цагаан бөмбөгөө удирд. Улбар шар орб цуглуулж, улаан хорхойноос зайлсхий. 20 секунд!" />
       </Arena>
+      <Controls mode="dpad"
+        onDown={(d: Dir) => { hold.current = { x: d === 'left' ? -1 : d === 'right' ? 1 : 0, y: d === 'up' ? -1 : d === 'down' ? 1 : 0 }; }}
+        onUp={() => { hold.current = { x: 0, y: 0 }; }} />
     </>
   );
 }
