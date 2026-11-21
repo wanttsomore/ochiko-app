@@ -8,17 +8,17 @@ import { photos } from '../data/photos';
 
 export type GameId = 'orb' | 'space' | 'snake';
 
-const GAMES: Record<GameId, { title: string; kicker: string; bg: any; Comp: React.ComponentType }> = {
-  orb: { title: 'Orb Rush', kicker: '🎮 GAME 01 · TILT', bg: photos.arcade, Comp: OrbRush },
-  space: { title: 'Space Dodger', kicker: '🚀 GAME 02 · SPACE', bg: photos.space, Comp: SpaceDodger },
-  snake: { title: 'Snake', kicker: '🐍 GAME 03 · SWIPE', bg: photos.retro, Comp: Snake },
+const GAMES: Record<GameId, { title: string; kicker: string; bg: any; Comp: React.ComponentType<{ onFinish?: (s: number) => void }> }> = {
+  orb: { title: 'Orb Rush', kicker: 'GAME 01 · TILT', bg: photos.arcade, Comp: OrbRush },
+  space: { title: 'Space Dodger', kicker: 'GAME 02 · SPACE', bg: photos.space, Comp: SpaceDodger },
+  snake: { title: 'Snake', kicker: 'GAME 03 · SWIPE', bg: photos.retro, Comp: Snake },
 };
 
-export default function GameHost({ game, onClose }: { game: GameId | null; onClose: () => void }) {
+export default function GameHost({ game, onClose, onFinish }: { game: GameId | null; onClose: () => void; onFinish?: (g: GameId, score: number) => void }) {
   const g = game ? GAMES[game] : null;
   return (
     <GameFrame visible={!!g} onClose={onClose} title={g?.title ?? ''} kicker={g?.kicker ?? ''} bg={g?.bg}>
-      {g && <g.Comp key={game} />}
+      {g && game && <g.Comp key={game} onFinish={(s) => onFinish?.(game, s)} />}
     </GameFrame>
   );
 }

@@ -1,9 +1,9 @@
 // Бүх тоглоомд хамаарах нийтлэг хүрээ: Modal, толгой, оноо (HUD), эхлэх/дуусах цонх.
-import React, { useRef, useState } from 'react';
-import { Modal, Pressable, StyleSheet, View, LayoutChangeEvent, ImageSourcePropType } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Modal, Pressable, StyleSheet, View, LayoutChangeEvent, ImageSourcePropType } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Background, Glass, IconCircle, T, tap } from '../components/ui';
+import { Background, Glass, IconCircle, T, tap, thud } from '../components/ui';
 import { useTheme } from '../theme';
 
 export type Phase = 'ready' | 'play' | 'over';
@@ -73,12 +73,36 @@ export function Arena({ children, onLayout, handlers, dark }: {
   );
 }
 
-// Эхлэх / Дууссан цонх
+// Эхлэх / Дууссан цонх. "Эхлэх" дарахад 3-2-1 гэж тоолоод тоглоом эхэлнэ.
 export function Overlay({ phase, icon, intro, score, best, onStart }: {
   phase: Phase; icon: any; intro: string; score: number; best: number; onStart: () => void;
 }) {
   const { theme } = useTheme();
+  const [count, setCount] = useState(0); // 0 = тоолохгүй байна
+  const pop = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (count === 0) return;
+    pop.setValue(0);
+    Animated.spring(pop, { toValue: 1, friction: 5, useNativeDriver: true }).start();
+    tap();
+    const t = setTimeout(() => {
+      if (count === 1) { setCount(0); thud(); onStart(); } else setCount(count - 1);
+    }, 650);
+    return () => clearTimeout(t);
+  }, [count]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (phase === 'play') return null;
+  if (count > 0) {
+    return (
+      <View style={styles.overlay}>
+        <Animated.Text style={{ fontSize: 110, fontWeight: '900', color: theme.accent,
+          opacity: pop, transform: [{ scale: pop.interpolate({ inputRange: [0, 1], outputRange: [2.2, 1] }) }] }}>
+          {count}
+        </Animated.Text>
+      </View>
+    );
+  }
   const over = phase === 'over';
   return (
     <View style={styles.overlay}>
@@ -87,9 +111,9 @@ export function Overlay({ phase, icon, intro, score, best, onStart }: {
         {over ? `Оноо: ${score}` : 'Бэлэн үү?'}
       </T>
       <T size={14} muted style={{ textAlign: 'center', marginTop: 6, lineHeight: 20, maxWidth: 270 }}>
-        {over ? (score >= best && score > 0 ? '🔥 Шинэ рекорд!' : 'Дахиад оролдоод үз!') : intro}
+        {over ? (score >= best && score > 0 ? 'Шинэ рекорд!' : 'Дахиад оролдоод үз!') : intro}
       </T>
-      <Pressable onPress={() => { tap(); onStart(); }} style={[styles.play, { backgroundColor: theme.accent }]}>
+      <Pressable onPress={() => setCount(3)} style={[styles.play, { backgroundColor: theme.accent }]}>
         <Ionicons name={over ? 'refresh' : 'play'} size={18} color="#fff" />
         <T size={16} weight="700" color="#fff" style={{ marginLeft: 8 }}>{over ? 'Дахин тоглох' : 'Эхлэх'}</T>
       </Pressable>

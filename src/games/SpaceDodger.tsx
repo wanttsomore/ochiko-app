@@ -1,4 +1,4 @@
-// 🚀 Тоглоом 2 — Space Dodger
+// Тоглоом 2 — Space Dodger
 // Сансрын хөлгөө утсаа хазайлгаж (эсвэл хуруугаараа чирж) зүүн/баруун тийш хөдөлгөөд унаж буй солируудаас зугт.
 // Солир бүрийг давахад +1 оноо, 3 амьтай. Хугацаа өнгөрөх тусам солир хурдасна.
 import React, { useEffect, useRef, useState } from 'react';
@@ -14,7 +14,7 @@ const LIVES = 3;
 type Rock = { id: number; x: number; y: number; r: number; v: number };
 type Star = { x: number; y: number; s: number };
 
-export default function SpaceDodger() {
+export default function SpaceDodger({ onFinish }: { onFinish?: (score: number) => void }) {
   const { theme } = useTheme();
   const { size, onLayout } = useArena();
   const [phase, setPhase] = useState<Phase>('ready');
@@ -90,7 +90,7 @@ export default function SpaceDodger() {
         if (r.y - r.r > h) { score.current++; if (score.current % 10 === 0) success(); continue; }
         if (now > hurtUntil.current && dist(r, { x: shipX.current, y: shipY }) < r.r + SHIP * 0.7) {
           lives.current--; hurtUntil.current = now + 1200; thud();
-          if (lives.current <= 0) { setBest((b) => Math.max(b, score.current)); setPhase('over'); return; }
+          if (lives.current <= 0) { setBest((b) => Math.max(b, score.current)); setPhase('over'); onFinish?.(score.current); return; }
           continue; // мөргөсөн солир алга болно
         }
         keep.push(r);
@@ -117,7 +117,7 @@ export default function SpaceDodger() {
   const shipY = size.current.h - 60;
   return (
     <>
-      <HUD items={[{ label: 'Оноо', value: score.current }, { label: 'Амь', value: '♥'.repeat(Math.max(0, lives.current)) || '—' }, { label: 'Рекорд', value: best }]} />
+      <HUD items={[{ label: 'Оноо', value: score.current }, { label: 'Амь', value: `${Math.max(0, lives.current)} / ${LIVES}` }, { label: 'Рекорд', value: best }]} />
       <Arena onLayout={onLayout} handlers={pan.panHandlers} dark>
         {stars.current.map((s, i) => (
           <View key={i} pointerEvents="none" style={{ position: 'absolute', left: s.x, top: s.y, width: s.s, height: s.s, borderRadius: 2, backgroundColor: '#fff', opacity: 0.3 + s.s / 4 }} />

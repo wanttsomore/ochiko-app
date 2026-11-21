@@ -1,4 +1,4 @@
-// 🐍 Тоглоом 3 — Snake
+// Тоглоом 3 — Snake
 // Дэлгэц дээр хуруугаа дээш/доош/зүүн/баруун гүйлгэж (swipe) могойгоо эргүүлнэ.
 // Хоол идэх бүрт урт нь нэмэгдэж, хурдасна. Хана эсвэл өөрийгөө мөргөвөл тоглоом дуусна.
 import React, { useEffect, useRef, useState } from 'react';
@@ -13,7 +13,7 @@ type Dir = 'up' | 'down' | 'left' | 'right';
 const STEP: Record<Dir, Cell> = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
 const OPPOSITE: Record<Dir, Dir> = { up: 'down', down: 'up', left: 'right', right: 'left' };
 
-export default function Snake() {
+export default function Snake({ onFinish }: { onFinish?: (score: number) => void }) {
   const { theme } = useTheme();
   const { size, onLayout } = useArena();
   const [phase, setPhase] = useState<Phase>('ready');
@@ -59,7 +59,7 @@ export default function Snake() {
       const hitWall = nh.x < 0 || nh.y < 0 || nh.x >= COLS || nh.y >= rows;
       const hitSelf = snake.current.some((s) => s.x === nh.x && s.y === nh.y);
       if (hitWall || hitSelf) {
-        thud(); setBest((b) => Math.max(b, score.current)); setPhase('over'); return;
+        thud(); setBest((b) => Math.max(b, score.current)); setPhase('over'); onFinish?.(score.current); return;
       }
 
       snake.current.unshift(nh); // толгойг урд нэмнэ
@@ -115,7 +115,7 @@ export default function Snake() {
           </View>
         )}
         <Overlay phase={phase} icon="git-commit" score={score.current} best={best} onStart={start}
-          intro="Хуруугаа дэлгэц дээр дээш, доош, зүүн, баруун гүйлгэж могойгоо эргүүл. 🟡 хоол идэх тусам урт, хурдан болно!" />
+          intro="Хуруугаа дэлгэц дээр дээш, доош, зүүн, баруун гүйлгэж могойгоо эргүүл. Шар хоол идэх тусам урт, хурдан болно." />
       </Arena>
     </>
   );

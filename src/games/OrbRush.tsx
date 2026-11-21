@@ -1,17 +1,17 @@
-// 🎮 Тоглоом 1 — Orb Rush
-// Утсаа хазайлгаж (Accelerometer) цагаан бөмбөгөө удирдаад улбар шар орб цуглуулна, 🐞 bug-аас зайлсхийнэ.
+// Тоглоом 1 — Orb Rush
+// Утсаа хазайлгаж (Accelerometer) цагаан бөмбөгөө удирдаад улбар шар орб цуглуулна, улаан хорхойноос зайлсхийнэ.
 // Мэдрэгчгүй төхөөрөмж дээр хуруугаараа чирж удирдана.
 import React, { useEffect, useRef, useState } from 'react';
 import { PanResponder, Platform, View, StyleSheet } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
-import { T, success, thud } from '../components/ui';
+import { success, thud } from '../components/ui';
 import { useTheme } from '../theme';
 import { Arena, HUD, Overlay, Phase, dist, useArena } from './GameFrame';
 
 const BALL = 18, ORB = 13, BUG = 16, TIME = 20;
 type Vec = { x: number; y: number };
 
-export default function OrbRush() {
+export default function OrbRush({ onFinish }: { onFinish?: (score: number) => void }) {
   const { theme } = useTheme();
   const { size, onLayout } = useArena();
   const [phase, setPhase] = useState<Phase>('ready');
@@ -93,7 +93,7 @@ export default function OrbRush() {
       // 5) Хугацаа
       timeLeft.current -= dt;
       if (timeLeft.current <= 0) {
-        timeLeft.current = 0; setBest((b) => Math.max(b, score.current)); thud(); setPhase('over'); return;
+        timeLeft.current = 0; setBest((b) => Math.max(b, score.current)); thud(); setPhase('over'); onFinish?.(score.current); return;
       }
       setFrame((f) => f + 1);
       raf = requestAnimationFrame(loop);
@@ -119,12 +119,17 @@ export default function OrbRush() {
         {phase === 'play' && (
           <>
             <View pointerEvents="none" style={[styles.circle, pos(orb.current, ORB), { backgroundColor: theme.accent, shadowColor: theme.accent }]} />
-            <View pointerEvents="none" style={[styles.center, pos(bug.current, BUG)]}><T size={22}>🐞</T></View>
+            <View pointerEvents="none" style={[styles.bug, pos(bug.current, BUG)]}>
+              <View style={styles.bugLine} />
+              <View style={[styles.bugDot, { left: BUG * 0.45, top: BUG * 0.5 }]} />
+              <View style={[styles.bugDot, { right: BUG * 0.45, top: BUG * 0.9 }]} />
+              <View style={[styles.bugDot, { left: BUG * 0.55, top: BUG * 1.3 }]} />
+            </View>
             <View pointerEvents="none" style={[styles.circle, pos(ball.current, BALL), { backgroundColor: hurt ? '#FF3B30' : '#fff', shadowColor: '#fff' }]} />
           </>
         )}
         <Overlay phase={phase} icon="radio-button-on" score={score.current} best={best} onStart={start}
-          intro="Утсаа хазайлгаж цагаан бөмбөгөө удирд (эсвэл хуруугаараа чир). Улбар шар орб цуглуулж, 🐞-аас зайлсхий. 20 секунд!" />
+          intro="Утсаа хазайлгаж цагаан бөмбөгөө удирд (эсвэл хуруугаараа чир). Улбар шар орб цуглуулж, улаан хорхойноос зайлсхий. 20 секунд!" />
       </Arena>
     </>
   );
@@ -133,5 +138,7 @@ export default function OrbRush() {
 const pos = (p: Vec, r: number) => ({ left: p.x - r, top: p.y - r, width: r * 2, height: r * 2, borderRadius: r });
 const styles = StyleSheet.create({
   circle: { position: 'absolute', shadowOpacity: 0.8, shadowRadius: 12, shadowOffset: { width: 0, height: 0 }, elevation: 6 },
-  center: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
+  bug: { position: 'absolute', backgroundColor: '#E5332A', borderWidth: 2, borderColor: '#1C1C1E', overflow: 'hidden' },
+  bugLine: { position: 'absolute', left: '48%', top: 0, bottom: 0, width: 2, backgroundColor: '#1C1C1E' },
+  bugDot: { position: 'absolute', width: 6, height: 6, borderRadius: 3, backgroundColor: '#1C1C1E' },
 });
