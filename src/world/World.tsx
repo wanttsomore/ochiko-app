@@ -8,7 +8,8 @@ import { Animated, Platform, Pressable, StyleSheet, View, useWindowDimensions } 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Accelerometer } from 'expo-sensors';
-import { Glass, IconCircle, MoodSwitch, T, Toggle, success, tap, thud } from '../components/ui';
+import { Glass, IconCircle, MoodSwitch, T, Toggle, buzz, success, tap, thud } from '../components/ui';
+import { isSoundEnabled, setSoundEnabled, sfx } from '../sound';
 import { useTheme } from '../theme';
 import { useShake } from '../hooks/useSensors';
 import { profile } from '../data/profile';
@@ -108,7 +109,7 @@ export default function World() {
       let nx = x.current + dir * speed * dt;
       if (nx > max) {
         nx = max;
-        if (dir > 0 && !bumped.current) { bumped.current = true; thud(); }
+        if (dir > 0 && !bumped.current) { bumped.current = true; thud(); sfx('bump'); }
       } else if (dir < 0) bumped.current = false;
       nx = Math.max(40, nx);
       const moved = Math.abs(nx - x.current) > 0.01;
@@ -124,7 +125,7 @@ export default function World() {
       if (isWalking !== wasWalking) { wasWalking = isWalking; setWalking(isWalking); }
       if (dir !== 0 && dir !== lastFacing) { lastFacing = dir as 1 | -1; setFacing(lastFacing); }
       const n = LEVELS.findIndex((l) => Math.abs(l.x - nx) < NEAR);
-      if (n !== lastNear) { lastNear = n; setNear(n); if (n >= 0) tap(); }
+      if (n !== lastNear) { lastNear = n; setNear(n); if (n >= 0) { buzz(); sfx('blip'); } }
 
       raf = requestAnimationFrame(loop);
     };
@@ -146,6 +147,7 @@ export default function World() {
         ? { title: `LEVEL UP · LV ${next.length + 1}`, sub: `Шинэ газар нээгдлээ: ${nl.title}` }
         : { title: 'БҮХ ТҮВШИН ДУУСЛАА', sub: 'Аялалд нэгдсэнд баярлалаа' };
       success();
+      sfx('levelup');
       if (game) pending.current = t; else setTimeout(() => showToast(t.title, t.sub), 350);
       return next;
     });
@@ -158,6 +160,7 @@ export default function World() {
   const enter = () => {
     if (near < 0 || (nextIdx !== -1 && near > nextIdx)) return;
     held.current = 0;
+    sfx('open');
     setOpen(near);
   };
   const restart = () => {
@@ -175,6 +178,7 @@ export default function World() {
     if (cheat.current >= 5) {
       cheat.current = 0;
       setCleared(LEVELS.slice(0, -1).map((l) => l.id));
+      sfx('levelup');
       showToast('CHEAT CODE', 'Бүх түвшин нээгдлээ');
     }
   };
@@ -392,7 +396,7 @@ function HoldButton({ icon, onDown, onUp }: { icon: any; onDown: () => void; onU
   const s = useRef(new Animated.Value(1)).current;
   return (
     <Pressable
-      onPressIn={() => { tap(); onDown(); Animated.spring(s, { toValue: 0.9, useNativeDriver: true }).start(); }}
+      onPressIn={() => { buzz(); onDown(); Animated.spring(s, { toValue: 0.9, useNativeDriver: true }).start(); }}
       onPressOut={() => { onUp(); Animated.spring(s, { toValue: 1, friction: 4, useNativeDriver: true }).start(); }}
     >
       <Animated.View style={[styles.hold, { transform: [{ scale: s }] }]}>
@@ -444,6 +448,7 @@ function Toast({ title, sub }: { title: string; sub: string }) {
 
 function Settings({ visible, onClose, tiltOn, setTiltOn }: { visible: boolean; onClose: () => void; tiltOn: boolean; setTiltOn: (v: boolean) => void }) {
   const { theme, setDark } = useTheme();
+  const [sound, setSound] = useState(isSoundEnabled());
   if (!visible) return null;
   return (
     <View style={styles.settingsWrap}>
@@ -455,6 +460,7 @@ function Settings({ visible, onClose, tiltOn, setTiltOn }: { visible: boolean; o
         </View>
         <T size={12} weight="700" muted style={{ marginBottom: 8 }}>ӨНГӨ</T>
         <MoodSwitch />
+        <Row label="Дуу" sub="Туурай, товч, LEVEL UP-ийн дуу" value={sound} onChange={(v) => { setSound(v); setSoundEnabled(v); }} />
         <Row label="Хазайлтаар удирдах" sub="Утсаа зүүн, баруун тийш хазайлга" value={tiltOn} onChange={setTiltOn} />
         <Row label="Бараан самбар" sub="Цонхнуудын өнгө" value={theme.dark} onChange={setDark} />
       </View>

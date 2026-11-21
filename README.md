@@ -47,6 +47,8 @@ Counter-Strike-ээр эхэлж, GTA, Ghost of Tsushima зэрэг тоглоо
 - **Пиксел арт** — морьтон (6 фреймтэй давхих анимэйшн), гэр, мод, бут, мөөг, хонь, овоо, сүлд бүгдийг `scripts/sprites/*.py` кодоор пиксел бүрээр зурсан; emoji, бэлэн зураг ашиглаагүй. Дахин үүсгэх: `sh scripts/sprites/generate.sh`
 - **Амьд тал нутаг** — өвс зулгааж буй хонь, санамсаргүй (тогтмол seed) байрлалтай мод, бут, цэцэг
 - **Тоглоомын удирдлага** — 3 тоглоомд сум товч (D-pad) нэмсэн
+- **Дуу** — туурайн чимээ, товч, түвшинд ойртох, LEVEL UP (монгол пентатоник аялгуу), оноо, мөргөлт, 3-2-1 тоолол. Бүх дууг `scripts/sounds/make_sounds.py` кодоор синтезлэсэн (`expo-audio`); тохиргооноос унтраана
+- **Өөрийн icon, splash** — пиксел морьтон, нар жаргах тал нутаг (`scripts/sprites/icon.py`)
 - **Game loop** — `requestAnimationFrame` дээр байрлал, камер, ойр байгаа түвшинг тооцно; React state-ийг зөвхөн өөрчлөгдөхөд шинэчилнэ
 - **Түвшний түгжээ, XP, LEVEL UP** — дуусгасан түвшний жагсаалтаас хаалтын байрлалыг тооцно
 - **Өдөр / шөнө** — шөнө тал нутаг харанхуйлж, гэрийн хаалга гэрэлтэнэ
@@ -55,7 +57,7 @@ Counter-Strike-ээр эхэлж, GTA, Ghost of Tsushima зэрэг тоглоо
 
 ## Ашигласан сангууд
 
-`expo`, `react-native`, TypeScript, `expo-sensors` (Accelerometer), `expo-haptics`, `expo-linear-gradient`, `react-native-safe-area-context`, `@expo/vector-icons`. Navigation сан ашиглаагүй.
+`expo`, `react-native`, TypeScript, `expo-audio`, `expo-sensors` (Accelerometer), `expo-haptics`, `expo-linear-gradient`, `react-native-safe-area-context`, `@expo/vector-icons`. Navigation сан ашиглаагүй.
 
 ## Бүтэц
 
@@ -65,7 +67,9 @@ src/world/World.tsx      # Тоглоомын ертөнц: game loop, каме�
 src/world/levels.ts      # 8 түвшний тодорхойлолт
 src/world/sprites.ts     # Пиксел арт зургийн жагсаалт
 src/world/Rider.tsx      # Морьтоны фрейм анимэйшн
-scripts/sprites/         # Пиксел арт зурдаг Python код (pixel.py, horse.py, props.py)
+scripts/sprites/         # Пиксел арт зурдаг Python код (pixel.py, horse.py, props.py, icon.py)
+scripts/sounds/          # Дуу синтезлэх Python код
+src/sound.ts             # Дуу тоглуулах модуль
 src/world/Panels.tsx     # Түвшин бүрийн самбар
 src/games/               # Orb Rush, Space Dodger, Snake + GameFrame
 src/data/profile.ts      # Бүх хувийн мэдээлэл

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Image, View } from 'react-native';
 import { PX, S } from './sprites';
+import { sfx } from '../sound';
 
 const FRAMES = [S.rider_0, S.rider_1, S.rider_2, S.rider_3, S.rider_4, S.rider_5];
 
@@ -14,7 +15,11 @@ export default function Rider({ walking, facing, scale = 1 }: { walking: boolean
   // Давхиж байхад 85мс тутам дараагийн фрейм
   useEffect(() => {
     if (!walking) return;
-    const t = setInterval(() => setF((v) => (v + 1) % FRAMES.length), 85);
+    const t = setInterval(() => setF((v) => {
+      const n = (v + 1) % FRAMES.length;
+      if (n === 2 || n === 5) sfx('hoof'); // хөл газар хүрэх фреймүүд дээр туурайн чимээ
+      return n;
+    }), 85);
     return () => clearInterval(t);
   }, [walking]);
 

@@ -20,9 +20,9 @@ const defs: Omit<Level, 'x'>[] = [
   { id: 'start', kind: 'start', title: 'Эхлэл', sub: 'Танилцуулга' },
   { id: 'about', kind: 'about', title: 'Миний тухай', sub: 'Замнал' },
   { id: 'skills', kind: 'skills', title: 'Ур чадвар', sub: 'Технологиуд' },
-  { id: 'orb', kind: 'game', title: 'Orb Rush', sub: 'Тоглоом 01', game: 'orb' },
-  { id: 'space', kind: 'game', title: 'Space Dodger', sub: 'Тоглоом 02', game: 'space' },
-  { id: 'snake', kind: 'game', title: 'Snake', sub: 'Тоглоом 03', game: 'snake' },
+  { id: 'orb', kind: 'game', title: 'Бүтээл 1', sub: 'Тоглоом 01', game: 'orb' },
+  { id: 'space', kind: 'game', title: 'Бүтээл 2', sub: 'Тоглоом 02', game: 'space' },
+  { id: 'snake', kind: 'game', title: 'Бүтээл 3', sub: 'Тоглоом 03', game: 'snake' },
   { id: 'contact', kind: 'contact', title: 'Холбоо барих', sub: 'Элч' },
   { id: 'dream', kind: 'dream', title: 'Мөрөөдөл', sub: 'Монголын түүхэн тоглоом' },
 ];

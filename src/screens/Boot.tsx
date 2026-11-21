@@ -6,6 +6,7 @@ import { Background, T, tap, thud } from '../components/ui';
 import { useTheme } from '../theme';
 import { profile } from '../data/profile';
 import { LEVELS } from '../world/levels';
+import { sfx } from '../sound';
 
 const LINES = [
   'тал нутгийг ачаалж байна',
@@ -41,6 +42,7 @@ export default function Boot({ onDone, bg }: { onDone: () => void; bg?: ImageSou
   const start = () => {
     if (!ready) return;
     thud();
+    sfx('open');
     Animated.timing(out, { toValue: 0, duration: 350, useNativeDriver: true }).start(onDone);
   };
 

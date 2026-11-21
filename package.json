@@ -5,6 +5,7 @@
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
     "expo": "~58.0.26",
+    "expo-audio": "~58.0.12",
     "expo-haptics": "~58.0.8",
     "expo-linear-gradient": "~58.0.4",
     "expo-sensors": "~58.0.5",
@@ -25,7 +26,10 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "photos": "node scripts/download-photos.js"
+    "photos": "node scripts/download-photos.js",
+    "1-commit": "git add -A && git commit -m \"Add sounds sync fix, pixel icon, content updates\" && git log --oneline -5",
+    "2-expo-login": "npx eas-cli@latest login",
+    "3-apk": "npx eas-cli@latest build -p android --profile preview"
   },
   "private": true
 }

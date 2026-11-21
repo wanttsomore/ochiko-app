@@ -8,9 +8,11 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTheme, Mood } from '../theme';
 import { useTilt } from '../hooks/useSensors';
+import { sfx } from '../sound';
 
 // ---------- Haptic туслах функцууд ----------
-export const tap = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+export const tap = () => { sfx('click'); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {}); };
+export const buzz = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {}); // зөвхөн чичиргээ
 export const thud = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
 export const success = () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
 

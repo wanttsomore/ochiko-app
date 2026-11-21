@@ -4,6 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PanResponder, StyleSheet, View } from 'react-native';
 import { success, thud, tap } from '../components/ui';
+import { sfx } from '../sound';
 import { useTheme } from '../theme';
 import { Arena, Controls, HUD, Overlay, Phase, useArena } from './GameFrame';
 
@@ -64,7 +65,7 @@ export default function Snake({ onFinish }: { onFinish?: (score: number) => void
 
       snake.current.unshift(nh); // толгойг урд нэмнэ
       if (nh.x === food.current.x && nh.y === food.current.y) {
-        score.current++; success(); placeFood(); // идсэн бол сүүлийг хасахгүй → урт нэмэгдэнэ
+        score.current++; success(); sfx('coin'); placeFood(); // идсэн бол сүүлийг хасахгүй → урт нэмэгдэнэ
       } else {
         snake.current.pop();
       }

@@ -6,6 +6,7 @@ import { PanResponder, Platform, StyleSheet, View } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { success, thud, tap } from '../components/ui';
+import { sfx } from '../sound';
 import { useTheme } from '../theme';
 import { Arena, Controls, HUD, Overlay, Phase, dist, useArena } from './GameFrame';
 
@@ -89,9 +90,9 @@ export default function SpaceDodger({ onFinish }: { onFinish?: (score: number) =
       const keep: Rock[] = [];
       for (const r of rocks.current) {
         r.y += r.v * dt;
-        if (r.y - r.r > h) { score.current++; if (score.current % 10 === 0) success(); continue; }
+        if (r.y - r.r > h) { score.current++; if (score.current % 10 === 0) { success(); sfx('coin'); } continue; }
         if (now > hurtUntil.current && dist(r, { x: shipX.current, y: shipY }) < r.r + SHIP * 0.7) {
-          lives.current--; hurtUntil.current = now + 1200; thud();
+          lives.current--; hurtUntil.current = now + 1200; thud(); sfx('hit');
           if (lives.current <= 0) { setBest((b) => Math.max(b, score.current)); setPhase('over'); onFinish?.(score.current); return; }
           continue; // мөргөсөн солир алга болно
         }

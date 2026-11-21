@@ -237,7 +237,7 @@ function DreamPanel({ onRestart }: { onRestart: () => void }) {
       <T size={13} weight="700" color={theme.accent} style={{ letterSpacing: 1.5 }}>БҮХ ТҮВШИН ДУУСЛАА</T>
       <T size={24} weight="800" style={{ marginTop: 4, lineHeight: 30 }}>Монголын түүхэн тоглоом</T>
       <T size={15} muted style={{ marginTop: 10, lineHeight: 23 }}>
-        Ghost of Yōtei, Red Dead Redemption 2 шиг өргөн нээлттэй ертөнцтэй, Монголын түүх дээр суурилсан тоглоом бүтээх — энэ бол миний мөрөөдөл.
+        Ghost of Yōtei, Red Dead Redemption 2 шиг өргөн нээлттэй ертөнцтэй, Монголын түүх дээр суурилсан тоглоом бүтээх мөрөөдөлтэй.
       </T>
       <T size={15} muted style={{ marginTop: 8, lineHeight: 23 }}>
         Таны сая туулсан энэ жижиг тал нутаг бол тэр замын эхний алхам.

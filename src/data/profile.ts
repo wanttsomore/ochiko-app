@@ -17,18 +17,18 @@ export const profile = {
   major: 'Мэдээллийн систем',
   // Товч танилцуулга — богино, тодорхой
   story: [
-    'Counter-Strike-ээр эхэлж, GTA, Ghost of Tsushima зэрэг тоглоомуудыг тоглож өссөн.',
-    'Ghost of Yōtei, Red Dead Redemption 2 шиг өргөн ертөнцтэй, Монголын түүхэн дээр суурилсан тоглоом бүтээх нь миний мөрөөдөл.',
+    'Counter-Strike 6 настайдаа тоглож, анх тоглоомд дуртай болсон',
+    'Ghost of Yōtei, Red Dead Redemption 2 шиг өргөн ертөнцтэй, Монголын түүхэн дээр суурилсан тоглоом бүтээх.',
     'Тэр мөрөөдөлдөө хүрэхийн тулд программчлалыг алхам алхмаар сурч байна.',
   ],
   // Тоглосон тоглоомууд
-  played: ['Counter-Strike', 'GTA', 'Ghost of Tsushima'],
+  played: ['Counter-Strike', 'GTA', 'Ghost of Tsushima', 'left 4 dead', 'DOTA 2', 'warcraft', 'RA'],
   // Сурсан замнал — тоглоомын түвшин шиг
   journey: [
     { title: 'HTML, CSS', text: 'Вэб хуудас хийх гэж эхэлсэн. Хуудасны бүтэц, өнгө, байрлал, responsive загвар хийж сурсан.', icon: 'logo-html5', state: 'done' },
     { title: 'JavaScript', text: 'Хуудсандаа логик, товч, хөдөлгөөн нэмж, программчлалын үндсэн ойлголтуудыг эзэмшсэн.', icon: 'logo-javascript', state: 'done' },
     { title: 'C#', text: 'Тоглоомын хөдөлгүүр Unity-д хэрэглэгддэг хэл учраас OOP, C#-ийг сурч эхэлсэн.', icon: 'code-slash', state: 'done' },
-    { title: 'React Native', text: 'Одоо мобайл апп хийж сурч байна. Энэ апп болон доторх 3 жижиг тоглоом нь анхны үр дүн.', icon: 'logo-react', state: 'now' },
+    { title: 'React Native', text: 'Одоо мобайл апп хийж сурч байгаа', icon: 'logo-react', state: 'now' },
     { title: 'Тоглоом хөгжүүлэлт', text: 'Ирээдүйд Unity, C# ашиглан Монголын түүхэн тоглоомоо бүтээнэ.', icon: 'flag', state: 'next' },
   ] as { title: string; text: string; icon: string; state: 'done' | 'now' | 'next' }[],
   interests: ['Тоглоом хөгжүүлэлт', 'Монголын түүх', 'Game design'],
@@ -45,7 +45,7 @@ export const skills: Skill[] = [
   { name: 'HTML', icon: 'logo-html5', level: 80, note: 'Бүтэцтэй, семантик хуудас' },
   { name: 'CSS', icon: 'logo-css3', level: 70, note: 'Flexbox, Grid, анимэйшн' },
   { name: 'JavaScript', icon: 'logo-javascript', level: 65, note: 'DOM, Canvas, ES6+' },
-  { name: 'C#', icon: 'code-slash', level: 50, note: 'OOP — тоглоомын хэл, сурч байна' },
+  { name: 'C#', icon: 'code-slash', level: 50, note: 'OOP - тоглоомын хэл, сурч байна' },
   { name: 'React Native', icon: 'logo-react', level: 50, note: 'Expo, Animated, Sensors' },
 ];
 

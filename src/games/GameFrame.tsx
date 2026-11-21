@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Background, Glass, IconCircle, T, tap, thud } from '../components/ui';
 import { useTheme } from '../theme';
+import { sfx } from '../sound';
 
 export type Phase = 'ready' | 'play' | 'over';
 
@@ -85,12 +86,15 @@ export function Overlay({ phase, icon, intro, score, best, onStart }: {
     if (count === 0) return;
     pop.setValue(0);
     Animated.spring(pop, { toValue: 1, friction: 5, useNativeDriver: true }).start();
-    tap();
+    sfx('beep');
     const t = setTimeout(() => {
-      if (count === 1) { setCount(0); thud(); onStart(); } else setCount(count - 1);
+      if (count === 1) { setCount(0); thud(); sfx('go'); onStart(); } else setCount(count - 1);
     }, 650);
     return () => clearTimeout(t);
   }, [count]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Тоглоом дуусах үед дуу
+  useEffect(() => { if (phase === 'over') sfx('over'); }, [phase]);
 
   if (phase === 'play') return null;
   if (count > 0) {

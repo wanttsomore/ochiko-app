@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { PanResponder, Platform, View, StyleSheet } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 import { success, thud } from '../components/ui';
+import { sfx } from '../sound';
 import { useTheme } from '../theme';
 import { Arena, Controls, Dir, HUD, Overlay, Phase, dist, useArena } from './GameFrame';
 
@@ -87,9 +88,9 @@ export default function OrbRush({ onFinish }: { onFinish?: (score: number) => vo
       if (bug.current.y < BUG || bug.current.y > h - BUG) bugVel.current.y *= -1;
 
       // 4) Мөргөлдөөн
-      if (dist(ball.current, orb.current) < BALL + ORB) { score.current++; orb.current = rand(ORB); success(); }
+      if (dist(ball.current, orb.current) < BALL + ORB) { score.current++; orb.current = rand(ORB); success(); sfx('coin'); }
       if (now > hurtUntil.current && dist(ball.current, bug.current) < BALL + BUG) {
-        score.current = Math.max(0, score.current - 3); hurtUntil.current = now + 1000; thud();
+        score.current = Math.max(0, score.current - 3); hurtUntil.current = now + 1000; thud(); sfx('hit');
       }
 
       // 5) Хугацаа
