@@ -5,36 +5,37 @@
 // =============================================================
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Platform, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Accelerometer } from 'expo-sensors';
-import Svg, { Circle } from 'react-native-svg';
 import { Glass, IconCircle, MoodSwitch, T, Toggle, success, tap, thud } from '../components/ui';
 import { useTheme } from '../theme';
 import { useShake } from '../hooks/useSensors';
 import { profile } from '../data/profile';
 import GameHost, { GameId } from '../games';
 import { LEVELS, Level, NEAR, WORLD_W } from './levels';
-import { getPalette } from './palette';
-import { Fence, Ger, GroundDecor, Ovoo, Ridge, Signpost, SkyDecor, Sulde } from './Scenery';
+import { PX, S, SpriteKey } from './sprites';
 import Rider from './Rider';
+import { Image } from 'react-native';
 import StationSheet from './Panels';
 
 const SPEED = 270; // морины хурд (px/сек)
 const TRAVEL = 620; // мини газрын зураг дээр дарж "хурдан аялах" хурд
 const START_X = 90;
+const GRASS = '#C6E39A';
+const PANEL = 'rgba(40,28,34,0.9)'; // HUD, товчны бараан өнгө (цайвар өвсөн дээр тод харагдана)
+const RIDER_SCALE = 0.8;
 
 export default function World() {
   const { theme } = useTheme();
   const { width: W, height: H } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [night, setNight] = useState(false);
-  const pal = getPalette(theme.mood, night);
 
   // ---------- Байршил (дэлгэцийн өндрөөс хамаарна → бүх утсанд таарна) ----------
-  const groundTop = H * 0.66;
-  const roadY = groundTop + Math.min(64, (H - groundTop) * 0.28);
+  const roadTop = Math.round(H * 0.5);
+  const roadH = S.road.h * PX;
+  const decor = useMemo(() => makeDecor(roadTop, roadH, H), [roadTop, roadH, H]);
 
   // ---------- Явц: аль түвшнүүдийг дуусгасан бэ ----------
   const [cleared, setCleared] = useState<string[]>([]);
@@ -178,79 +179,66 @@ export default function World() {
     }
   };
 
-  // ---------- Parallax давхаргууд ----------
-  const layer = (f: number) => ({ transform: [{ translateX: Animated.multiply(cam, -f) }] });
-  const layers = useMemo(() => ({ sky: layer(0.04), far: layer(0.15), mid: layer(0.32), hills: layer(0.6), ground: layer(1) }), [cam]); // eslint-disable-line react-hooks/exhaustive-deps
-  const wOf = (f: number) => Math.ceil(W + (WORLD_W - W) * f + 200);
+  const cam1 = useMemo(() => ({ transform: [{ translateX: Animated.multiply(cam, -1) }] }), [cam]);
   const introOpacity = riderX.interpolate({ inputRange: [START_X, 520], outputRange: [1, 0], extrapolate: 'clamp' });
   const mapW = Math.min(W, 520) - 40;
   const canEnter = near >= 0 && (nextIdx === -1 || near <= nextIdx);
 
   return (
-    <View style={{ flex: 1, backgroundColor: pal.sky[0] }}>
-      {/* Тэнгэр */}
-      <LinearGradient colors={pal.sky} locations={[0, 0.35, 0.75, 1]} style={[StyleSheet.absoluteFill, { bottom: H - groundTop - 10 }]} />
-      <Svg width={W} height={groundTop} style={StyleSheet.absoluteFill} pointerEvents="none">
-        <Circle cx={W * 0.78} cy={groundTop * 0.52} r={pal.night ? 26 : 46} fill={pal.sun} opacity={pal.night ? 0.95 : 0.9} />
-        {pal.night && <Circle cx={W * 0.78 + 10} cy={groundTop * 0.52 - 6} r={22} fill={pal.sky[1]} />}
-      </Svg>
-      <Animated.View pointerEvents="none" style={[styles.abs, layers.sky]}>
-        <SkyDecor width={wOf(0.04)} height={groundTop} cloud={pal.cloud} night={pal.night} seed={7} />
-      </Animated.View>
+    <View style={{ flex: 1, backgroundColor: GRASS }}>
+      {/* Тал нутаг: нэг давхарга, камер морьтоныг дагаж хөдөлнө */}
+      <Animated.View style={[styles.abs, { top: 0, width: WORLD_W, height: H }, cam1]}>
+        {/* Арын мод, хашаа, цэцэг (замын дээд тал) */}
+        {decor.back.map((d, i) => <Sprite key={`b${i}`} k={d.k} x={d.x} bottom={d.y} />)}
 
-      {/* Уулс — хол байх тусам удаан хөдөлнө (parallax) */}
-      <Animated.View pointerEvents="none" style={[styles.abs, { top: groundTop - H * 0.3 + 6 }, layers.far]}>
-        <Ridge width={wOf(0.15)} height={H * 0.3} color={pal.far} seed={3} peaks={0.75} step={160} />
-      </Animated.View>
-      <Animated.View pointerEvents="none" style={[styles.abs, { top: groundTop - H * 0.19 + 8 }, layers.mid]}>
-        <Ridge width={wOf(0.32)} height={H * 0.19} color={pal.mid} seed={11} peaks={0.6} step={130} />
-      </Animated.View>
-      <Animated.View pointerEvents="none" style={[styles.abs, { top: groundTop - H * 0.09 + 10 }, layers.hills]}>
-        <Ridge width={wOf(0.6)} height={H * 0.09} color={pal.hills} seed={21} peaks={0.5} step={110} />
-      </Animated.View>
+        {LEVELS.map((l, i) => (
+          <Station key={l.id} level={l} index={i} bottom={roadTop + 8} locked={nextIdx !== -1 && i > nextIdx}
+            done={cleared.includes(l.id)} active={near === i} onPress={() => { tap(); target.current = l.x; }} />
+        ))}
 
-      {/* Газар + түвшнүүд + морьтон */}
-      <Animated.View style={[styles.abs, { top: 0, width: WORLD_W, height: H }, layers.ground]}>
-        <LinearGradient colors={pal.ground} style={{ position: 'absolute', top: groundTop, left: 0, width: WORLD_W, height: H - groundTop }} />
-        <View style={{ position: 'absolute', top: roadY - 4, left: 0, width: WORLD_W, height: 14, backgroundColor: pal.road, borderRadius: 7, opacity: 0.85 }} />
-        <View style={{ position: 'absolute', top: roadY + 22, left: 0 }} pointerEvents="none">
-          <GroundDecor width={WORLD_W} color={pal.grass} seed={5} />
-        </View>
+        {/* Шороон зам */}
+        {Array.from({ length: Math.ceil(WORLD_W / (S.road.w * PX)) + 1 }, (_, i) => (
+          <Image key={`r${i}`} source={S.road.src} style={{ position: 'absolute', left: i * S.road.w * PX, top: roadTop, width: S.road.w * PX, height: roadH }} />
+        ))}
 
-        {LEVELS.map((l, i) => {
-          const locked = nextIdx !== -1 && i > nextIdx;
-          const done = cleared.includes(l.id);
-          return (
-            <Station key={l.id} level={l} index={i} roadY={roadY} locked={locked} done={done} active={near === i}
-              onPress={() => { tap(); target.current = l.x; }} />
-          );
-        })}
-
+        {/* Түгжээтэй хаалт — замыг хаана */}
         {nextIdx !== -1 && nextIdx < LEVELS.length - 1 && (
-          <View pointerEvents="none" style={{ position: 'absolute', left: gateX - 35, top: roadY - 84 }}>
-            <Fence />
+          <View pointerEvents="none" style={{ position: 'absolute', left: gateX - (S.gate.w * PX) / 2, top: roadTop + roadH * 0.62 - S.gate.h * PX }}>
+            <Image source={S.gate.src} style={{ width: S.gate.w * PX, height: S.gate.h * PX }} />
             <View style={[styles.lock, { backgroundColor: theme.accent }]}><Ionicons name="lock-closed" size={14} color="#fff" /></View>
           </View>
         )}
 
-        <Animated.View pointerEvents="none" style={{ position: 'absolute', top: roadY - 92, left: -60, transform: [{ translateX: riderX }] }}>
-          <Rider walking={walking} facing={facing} deel={theme.mood === 'cold' ? '#3F6FB5' : '#2F5E9E'} />
+        {/* Морьтон */}
+        <Animated.View pointerEvents="none" style={{ position: 'absolute', top: roadTop + roadH * 0.62 - 56 * PX * RIDER_SCALE, left: -(S.rider_0.w * PX * RIDER_SCALE) / 2, transform: [{ translateX: riderX }] }}>
+          <Rider walking={walking} facing={facing} scale={RIDER_SCALE} />
         </Animated.View>
+
+        {/* Замын доод тал: бут, мөөг, хонь, мод */}
+        {decor.front.map((d, i) =>
+          d.k === 'sheep_0' ? <Sheep key={`f${i}`} x={d.x} bottom={d.y} seed={i} /> : <Sprite key={`f${i}`} k={d.k} x={d.x} bottom={d.y} />,
+        )}
+
+        {/* Шөнө: бүх зүйлийг бараан цэнхэр өнгөөр бүрхэж, гэрийн хаалгыг гэрэлтүүлнэ */}
+        {night && <View pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0, width: WORLD_W, height: H, backgroundColor: 'rgba(16,22,60,0.55)' }} />}
+        {night && LEVELS.filter((l) => l.kind === 'about' || l.kind === 'skills' || l.kind === 'game').map((l) => (
+          <View key={`g${l.id}`} pointerEvents="none" style={[styles.glow, { left: l.x - 25, top: roadTop + 8 - 14 * PX - 25 }]} />
+        ))}
       </Animated.View>
 
       {/* ---------- HUD ---------- */}
       <View style={[styles.hudWrap, { paddingTop: insets.top + 8 }]} pointerEvents="box-none">
-        <Glass strong style={styles.hud}>
+        <Glass strong style={[styles.hud, { backgroundColor: PANEL, borderColor: 'rgba(255,255,255,0.12)' }]}>
           <View style={[styles.avatar, { backgroundColor: theme.accent }]}><T size={14} weight="800" color="#fff">ОЧ</T></View>
           <View style={{ flex: 1, marginLeft: 10 }}>
-            <T size={15} weight="700" numberOfLines={1}>{profile.name}</T>
-            <View style={[styles.xp, { backgroundColor: theme.track }]}>
+            <T size={15} weight="700" color="#fff" numberOfLines={1}>{profile.name}</T>
+            <View style={[styles.xp, { backgroundColor: 'rgba(255,255,255,0.15)' }]}>
               <View style={{ width: `${(cleared.length / LEVELS.length) * 100}%`, height: '100%', backgroundColor: theme.accent, borderRadius: 3 }} />
             </View>
           </View>
           <Pressable onPress={onBadge} hitSlop={6} style={[styles.badge, { borderColor: theme.accent }]}>
-            <T size={9} weight="700" muted>LV</T>
-            <T size={15} weight="800" style={{ marginTop: -2 }}>{levelNum}</T>
+            <T size={9} weight="700" color="rgba(255,255,255,0.6)">LV</T>
+            <T size={15} weight="800" color="#fff" style={{ marginTop: -2 }}>{levelNum}</T>
           </Pressable>
           <View style={{ width: 8 }} />
           <IconCircle name={night ? 'sunny' : 'moon'} size={36} onPress={() => setNight(!night)} />
@@ -260,14 +248,14 @@ export default function World() {
 
         {/* Мини газрын зураг — дарж хурдан аялна */}
         <View style={[styles.map, { width: mapW }]}>
-          <View style={[styles.mapLine, { backgroundColor: 'rgba(255,255,255,0.35)' }]} />
+          <View style={[styles.mapLine, { backgroundColor: 'rgba(40,28,34,0.45)' }]} />
           {LEVELS.map((l, i) => {
             const reach = nextIdx === -1 || i <= nextIdx;
             const done = cleared.includes(l.id);
             return (
               <Pressable key={l.id} hitSlop={10} disabled={!reach}
                 onPress={() => { tap(); target.current = l.x; }}
-                style={[styles.mapDot, { left: (l.x / WORLD_W) * mapW - 7, backgroundColor: done ? theme.accent : reach ? '#fff' : 'rgba(255,255,255,0.3)' }]} />
+                style={[styles.mapDot, { left: (l.x / WORLD_W) * mapW - 7, backgroundColor: done ? theme.accent : reach ? '#fff' : 'rgba(40,28,34,0.35)' }]} />
             );
           })}
           <Animated.View pointerEvents="none" style={[styles.mapRider, { borderColor: theme.accent,
@@ -275,10 +263,12 @@ export default function World() {
         </View>
 
         {/* Эхний дэлгэцийн танилцуулга: нэр, чиглэл, нэг өгүүлбэр */}
-        <Animated.View pointerEvents="none" style={{ opacity: introOpacity, marginTop: 14, width: '100%', maxWidth: 520 }}>
-          <T size={12} weight="700" color="#fff" style={styles.shadowText}>{profile.role.toUpperCase()}</T>
-          <T size={34} weight="800" color="#fff" style={[styles.shadowText, { letterSpacing: -0.5 }]}>{profile.name}</T>
-          <T size={15} color="rgba(255,255,255,0.92)" style={[styles.shadowText, { marginTop: 4, lineHeight: 21, maxWidth: 330 }]}>{profile.tagline}</T>
+        <Animated.View pointerEvents="none" style={{ opacity: introOpacity, marginTop: 12, width: '100%', maxWidth: 520 }}>
+          <View style={styles.intro}>
+            <T size={11} weight="700" color={theme.accent} style={{ letterSpacing: 1.2 }}>{profile.role.toUpperCase()}</T>
+            <T size={28} weight="800" color="#fff" style={{ letterSpacing: -0.5 }}>{profile.name}</T>
+            <T size={14} color="rgba(255,255,255,0.88)" style={{ marginTop: 2, lineHeight: 20 }}>{profile.tagline}</T>
+          </View>
         </Animated.View>
       </View>
 
@@ -290,9 +280,9 @@ export default function World() {
         </View>
         <View style={{ alignItems: 'flex-end', flex: 1 }}>
           {near >= 0 && (
-            <Glass strong style={styles.prompt}>
+            <Glass strong style={[styles.prompt, { backgroundColor: PANEL, borderColor: 'rgba(255,255,255,0.12)' }]}>
               <T size={11} weight="700" color={theme.accent}>LV {near + 1} · {LEVELS[near].sub}</T>
-              <T size={14} weight="700" numberOfLines={1}>{canEnter ? LEVELS[near].title : 'Түгжээтэй'}</T>
+              <T size={14} weight="700" color="#fff" numberOfLines={1}>{canEnter ? LEVELS[near].title : 'Түгжээтэй'}</T>
             </Glass>
           )}
           <ActionButton enabled={canEnter} onPress={enter} />
@@ -312,9 +302,30 @@ export default function World() {
   );
 }
 
+// ---------- Пиксел зураг ----------
+function Sprite({ k, x, bottom, flip }: { k: SpriteKey; x: number; bottom: number; flip?: boolean }) {
+  const sp = S[k];
+  return (
+    <Image pointerEvents="none" source={sp.src}
+      style={{ position: 'absolute', left: x - (sp.w * PX) / 2, top: bottom - sp.h * PX, width: sp.w * PX, height: sp.h * PX, transform: flip ? [{ scaleX: -1 }] : undefined }} />
+  );
+}
+
+// Өвс зулгааж буй хонь (2 фрейм)
+function Sheep({ x, bottom, seed }: { x: number; bottom: number; seed: number }) {
+  const [f, setF] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setF((v) => 1 - v), 520 + (seed % 4) * 130);
+    return () => clearInterval(t);
+  }, [seed]);
+  return <Sprite k={f ? 'sheep_1' : 'sheep_0'} x={x} bottom={bottom} flip={seed % 2 === 0} />;
+}
+
 // ---------- Түвшний барилга + самбар ----------
-function Station({ level, index, roadY, locked, done, active, onPress }: {
-  level: Level; index: number; roadY: number; locked: boolean; done: boolean; active: boolean; onPress: () => void;
+const ART: Record<string, SpriteKey> = { start: 'sign', about: 'ger', skills: 'ger', game: 'ger_lit', contact: 'ovoo', dream: 'sulde' };
+
+function Station({ level, index, bottom, locked, done, active, onPress }: {
+  level: Level; index: number; bottom: number; locked: boolean; done: boolean; active: boolean; onPress: () => void;
 }) {
   const { theme } = useTheme();
   const bounce = useRef(new Animated.Value(0)).current;
@@ -323,31 +334,57 @@ function Station({ level, index, roadY, locked, done, active, onPress }: {
     bounce.setValue(0);
     Animated.spring(bounce, { toValue: 1, friction: 4, useNativeDriver: true }).start();
   }, [active, bounce]);
-
-  const art =
-    level.kind === 'start' ? <Signpost /> :
-    level.kind === 'contact' ? <Ovoo /> :
-    level.kind === 'dream' ? <Sulde glow={locked ? undefined : theme.accent} /> :
-    <Ger size={200} lit={level.kind === 'game' && !locked ? theme.accent : undefined} />;
-  const artH = level.kind === 'start' ? 110 : level.kind === 'contact' ? 130 : level.kind === 'dream' ? 190 : 160;
-  const artW = level.kind === 'start' ? 110 : level.kind === 'contact' ? 130 : level.kind === 'dream' ? 114 : 200;
-
+  const sp = S[ART[level.kind]];
+  const w = sp.w * PX, h = sp.h * PX;
   return (
-    <Pressable onPress={onPress} style={{ position: 'absolute', left: level.x - artW / 2, top: roadY - artH + 8, width: artW, height: artH, alignItems: 'center' }}>
-      <View style={{ opacity: locked ? 0.55 : 1 }}>{art}</View>
-      <View pointerEvents="none" style={{ position: 'absolute', left: -120, right: -120, bottom: artH + 8, alignItems: 'center' }}>
-      <Animated.View
-        style={[styles.sign, { backgroundColor: done ? theme.accent : 'rgba(18,18,20,0.78)',
-          borderColor: active ? theme.accent : 'rgba(255,255,255,0.15)',
-          transform: [{ translateY: bounce.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, -8, 0] }) }],
-        }]}
-      >
-        <Ionicons name={done ? 'checkmark' : locked ? 'lock-closed' : 'flag'} size={12} color="#fff" />
-        <T size={12} weight="700" color="#fff" style={{ marginLeft: 6 }}>LV {index + 1} · {level.title}</T>
-      </Animated.View>
+    <Pressable onPress={onPress} style={{ position: 'absolute', left: level.x - w / 2, top: bottom - h, width: w, height: h }}>
+      <Image source={sp.src} style={{ width: w, height: h, opacity: locked ? 0.6 : 1 }} />
+      <View pointerEvents="none" style={{ position: 'absolute', left: -120, right: -120, bottom: h + 6, alignItems: 'center' }}>
+        <Animated.View
+          style={[styles.sign, {
+            backgroundColor: done ? theme.accent : 'rgba(40,28,34,0.88)',
+            borderColor: active ? theme.accent : 'rgba(255,255,255,0.2)',
+            transform: [{ translateY: bounce.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, -8, 0] }) }],
+          }]}
+        >
+          <Ionicons name={done ? 'checkmark' : locked ? 'lock-closed' : 'flag'} size={12} color="#fff" />
+          <T size={12} weight="700" color="#fff" style={{ marginLeft: 6 }}>LV {index + 1} · {level.title}</T>
+        </Animated.View>
       </View>
     </Pressable>
   );
+}
+
+// ---------- Чимэглэлийг санамсаргүй (гэхдээ тогтмол seed-ээр) байрлуулах ----------
+function rng(seed: number) {
+  let v = seed;
+  return () => { v = (v * 9301 + 49297) % 233280; return v / 233280; };
+}
+function makeDecor(roadTop: number, roadH: number, H: number) {
+  const r = rng(42);
+  const back: { k: SpriteKey; x: number; y: number }[] = [];
+  const front: { k: SpriteKey; x: number; y: number }[] = [];
+  const nearStation = (x: number, d: number) => LEVELS.some((l) => Math.abs(l.x - x) < d);
+  // Арын модны эгнээ
+  for (let x = -20; x < WORLD_W + 60; x += 70 + r() * 60) back.push({ k: r() > 0.5 ? 'tree_a' : 'tree_b', x, y: roadTop - 130 - r() * 40 });
+  back.sort((a, b) => a.y - b.y);
+  // Замын дагуух хашаа, бут, цэцэг
+  for (let x = 60; x < WORLD_W; x += 90 + r() * 120) {
+    if (nearStation(x, 150)) continue;
+    const t = r();
+    back.push({ k: t < 0.4 ? 'fence' : t < 0.65 ? 'bush_a' : t < 0.8 ? 'rock' : t < 0.9 ? 'flower_pink' : 'tuft', x, y: roadTop + 4 });
+  }
+  // Доод тал
+  const bottom = roadTop + roadH;
+  for (let x = 30; x < WORLD_W; x += 40 + r() * 70) {
+    const y = bottom + 24 + r() * Math.max(40, H - bottom - 60);
+    const t = r();
+    const k: SpriteKey = t < 0.18 ? 'bush_a' : t < 0.3 ? 'bush_b' : t < 0.42 ? 'tuft' : t < 0.5 ? 'mush_red' : t < 0.56 ? 'mush_blue'
+      : t < 0.66 ? 'flower_white' : t < 0.74 ? 'flower_pink' : t < 0.8 ? 'rock' : t < 0.9 ? 'sheep_0' : r() > 0.5 ? 'tree_a' : 'tree_b';
+    front.push({ k, x, y: k.startsWith('tree') ? Math.max(y, bottom + 200) : y });
+  }
+  front.sort((a, b) => a.y - b.y);
+  return { back, front };
 }
 
 // Дарж байх хооронд ажилладаг товч
@@ -382,7 +419,7 @@ function ActionButton({ enabled, onPress }: { enabled: boolean; onPress: () => v
     <Pressable onPress={() => { if (enabled) { tap(); onPress(); } }} hitSlop={8}>
       <View style={{ width: 84, height: 84, alignItems: 'center', justifyContent: 'center' }}>
         <Animated.View style={[styles.ring, { borderColor: theme.accent, opacity: pulse, transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.25] }) }] }]} />
-        <View style={[styles.action, { backgroundColor: enabled ? theme.accent : 'rgba(20,20,22,0.55)' }]}>
+        <View style={[styles.action, { backgroundColor: enabled ? theme.accent : 'rgba(40,28,34,0.78)' }]}>
           <Ionicons name="enter-outline" size={24} color="#fff" />
           <T size={12} weight="800" color="#fff">Орох</T>
         </View>
@@ -416,7 +453,7 @@ function Settings({ visible, onClose, tiltOn, setTiltOn }: { visible: boolean; o
           <T size={20} weight="800">Тохиргоо</T>
           <IconCircle name="close" size={34} onPress={onClose} />
         </View>
-        <T size={12} weight="700" muted style={{ marginBottom: 8 }}>УЛИРАЛ / ӨНГӨ</T>
+        <T size={12} weight="700" muted style={{ marginBottom: 8 }}>ӨНГӨ</T>
         <MoodSwitch />
         <Row label="Хазайлтаар удирдах" sub="Утсаа зүүн, баруун тийш хазайлга" value={tiltOn} onChange={setTiltOn} />
         <Row label="Бараан самбар" sub="Цонхнуудын өнгө" value={theme.dark} onChange={setDark} />
@@ -448,11 +485,12 @@ const styles = StyleSheet.create({
   mapLine: { height: 2, borderRadius: 1 },
   mapDot: { position: 'absolute', width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: 'rgba(0,0,0,0.35)' },
   mapRider: { position: 'absolute', left: -9, width: 18, height: 18, borderRadius: 9, borderWidth: 3, backgroundColor: '#fff' },
-  shadowText: { textShadowColor: 'rgba(0,0,0,0.45)', textShadowRadius: 8, textShadowOffset: { width: 0, height: 1 } },
+  intro: { backgroundColor: 'rgba(40,28,34,0.82)', borderRadius: 20, paddingVertical: 12, paddingHorizontal: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)' },
+  glow: { position: 'absolute', width: 50, height: 50, borderRadius: 25, backgroundColor: '#FFD86B', opacity: 0.3 },
   sign: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, borderWidth: 1.5 },
   lock: { position: 'absolute', top: -14, left: 21, width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   controls: { position: 'absolute', left: 18, right: 18, flexDirection: 'row', alignItems: 'flex-end' },
-  hold: { width: 66, height: 66, borderRadius: 33, backgroundColor: 'rgba(20,20,22,0.55)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
+  hold: { width: 66, height: 66, borderRadius: 33, backgroundColor: 'rgba(40,28,34,0.78)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
   prompt: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 16, marginBottom: 8, maxWidth: 200 },
   ring: { position: 'absolute', width: 84, height: 84, borderRadius: 42, borderWidth: 3 },
   action: { width: 74, height: 74, borderRadius: 37, alignItems: 'center', justifyContent: 'center' },

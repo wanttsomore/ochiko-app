@@ -75,38 +75,58 @@ function StartPanel() {
         <Info icon="radio-button-on-outline" text="Гэр, овооны дэргэд очоод «Орох» товчийг дар." />
         <Info icon="lock-open-outline" text="Түвшин бүрийг дуусгах тусам замын хаалт нээгдэнэ." />
         <Info icon="phone-portrait-outline" text="Утсаа сэгсэрвэл өдөр шөнө солигдоно." />
+        <Info icon="map-outline" text="Дээд талын жижиг газрын зураг дээр дарж хурдан аялж болно." />
       </Glass>
     </View>
   );
 }
 
-// ---------- Lv2: Миний түүх ----------
+// ---------- Lv2: Миний тухай + замнал ----------
 function AboutPanel() {
   const { theme } = useTheme();
-  const steps = [...profile.played, 'Миний тоглоом'];
   return (
     <View>
       <Image source={photos.ger} style={styles.photo} resizeMode="cover" />
       {profile.story.map((p, i) => (
         <T key={i} size={15} style={{ lineHeight: 23, marginBottom: 10 }} muted={i !== 1} weight={i === 1 ? '700' : '400'}>{p}</T>
       ))}
-      <T size={13} weight="700" style={{ marginTop: 10, marginBottom: 12 }}>ЗАМНАЛ</T>
-      <View style={styles.timeline}>
-        {steps.map((s, i) => {
-          const last = i === steps.length - 1;
-          return (
-            <React.Fragment key={s}>
-              <View style={{ alignItems: 'center', flex: 1 }}>
-                <View style={[styles.node, { backgroundColor: last ? theme.accent : theme.glassStrong, borderColor: last ? theme.accent : theme.border }]}>
-                  <Ionicons name={last ? 'flag' : 'game-controller'} size={16} color={last ? '#fff' : theme.text} />
-                </View>
-                <T size={11} weight="600" style={{ textAlign: 'center', marginTop: 6 }}>{s}</T>
-              </View>
-              {!last && <View style={[styles.link, { backgroundColor: theme.border }]} />}
-            </React.Fragment>
-          );
-        })}
+
+      <T size={13} weight="700" style={{ marginTop: 8, marginBottom: 10 }}>ТОГЛОСОН ТОГЛООМУУД</T>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        {profile.played.map((g) => <Pill key={g} label={g} icon="game-controller" />)}
       </View>
+
+      <T size={13} weight="700" style={{ marginTop: 22, marginBottom: 12 }}>ЗАМНАЛ</T>
+      {profile.journey.map((j, i) => {
+        const last = i === profile.journey.length - 1;
+        const now = j.state === 'now';
+        const next = j.state === 'next';
+        return (
+          <View key={j.title} style={{ flexDirection: 'row' }}>
+            <View style={{ alignItems: 'center', width: 44 }}>
+              <View style={[styles.node, {
+                backgroundColor: now ? theme.accent : next ? 'transparent' : theme.glassStrong,
+                borderColor: now || next ? theme.accent : theme.border, borderStyle: next ? 'dashed' : 'solid',
+              }]}>
+                <Ionicons name={j.icon as any} size={17} color={now ? '#fff' : next ? theme.accent : theme.text} />
+              </View>
+              {!last && <View style={[styles.vline, { backgroundColor: theme.border }]} />}
+            </View>
+            <View style={{ flex: 1, paddingBottom: last ? 0 : 18, marginLeft: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <T size={15} weight="700">{j.title}</T>
+                {(now || next) && (
+                  <View style={[styles.tag, { backgroundColor: now ? theme.accent : theme.glassStrong }]}>
+                    <T size={10} weight="800" color={now ? '#fff' : theme.accent}>{now ? 'ОДОО' : 'ИРЭЭДҮЙ'}</T>
+                  </View>
+                )}
+              </View>
+              <T size={13} muted style={{ lineHeight: 19, marginTop: 2 }}>{j.text}</T>
+            </View>
+          </View>
+        );
+      })}
+
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 18 }}>
         {profile.interests.map((i) => <Pill key={i} label={i} icon="sparkles" />)}
       </View>
@@ -217,7 +237,7 @@ function DreamPanel({ onRestart }: { onRestart: () => void }) {
       <T size={13} weight="700" color={theme.accent} style={{ letterSpacing: 1.5 }}>БҮХ ТҮВШИН ДУУСЛАА</T>
       <T size={24} weight="800" style={{ marginTop: 4, lineHeight: 30 }}>Монголын түүхэн тоглоом</T>
       <T size={15} muted style={{ marginTop: 10, lineHeight: 23 }}>
-        GTA, Ghost of Tsushima шиг том хэмжээний, Монголын түүх дээр суурилсан тоглоом бүтээх — энэ бол миний мөрөөдөл.
+        Ghost of Yōtei, Red Dead Redemption 2 шиг өргөн нээлттэй ертөнцтэй, Монголын түүх дээр суурилсан тоглоом бүтээх — энэ бол миний мөрөөдөл.
       </T>
       <T size={15} muted style={{ marginTop: 8, lineHeight: 23 }}>
         Таны сая туулсан энэ жижиг тал нутаг бол тэр замын эхний алхам.
@@ -254,9 +274,9 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   avatar: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center' },
   photo: { width: '100%', height: 170, borderRadius: 22, marginBottom: 16 },
-  timeline: { flexDirection: 'row', alignItems: 'flex-start' },
+  vline: { width: 2, flex: 1, marginVertical: 4 },
+  tag: { marginLeft: 8, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 8 },
   node: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  link: { height: 2, flex: 0.5, marginTop: 19 },
   skillIcon: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
   track: { height: 6, borderRadius: 3, marginTop: 14, overflow: 'hidden' },
   trackFill: { height: 6, borderRadius: 3 },

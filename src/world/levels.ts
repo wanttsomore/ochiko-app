@@ -18,7 +18,7 @@ const GAP = 520; // хоёр түвшний хоорондох зай
 
 const defs: Omit<Level, 'x'>[] = [
   { id: 'start', kind: 'start', title: 'Эхлэл', sub: 'Танилцуулга' },
-  { id: 'about', kind: 'about', title: 'Миний түүх', sub: 'Миний тухай' },
+  { id: 'about', kind: 'about', title: 'Миний тухай', sub: 'Замнал' },
   { id: 'skills', kind: 'skills', title: 'Ур чадвар', sub: 'Технологиуд' },
   { id: 'orb', kind: 'game', title: 'Orb Rush', sub: 'Тоглоом 01', game: 'orb' },
   { id: 'space', kind: 'game', title: 'Space Dodger', sub: 'Тоглоом 02', game: 'space' },
