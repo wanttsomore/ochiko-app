@@ -1,0 +1,26 @@
+{
+  // VS Code: Terminal → Run Task... → "▶ Ochiko: суулгаад ажиллуулах"
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "▶ Ochiko: суулгаад ажиллуулах",
+      "type": "shell",
+      "command": "npm install; npm run photos; npx expo start",
+      "windows": { "command": "npm install; npm run photos; npx expo start" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "▶ Ochiko: ажиллуулах (Expo Go)",
+      "type": "shell",
+      "command": "npx expo start",
+      "problemMatcher": []
+    },
+    {
+      "label": "▶ Ochiko: хөтөч дээр үзэх (web)",
+      "type": "shell",
+      "command": "npx expo start --web",
+      "problemMatcher": []
+    }
+  ]
+}
