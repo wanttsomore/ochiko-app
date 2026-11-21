@@ -2,7 +2,7 @@
 import React, { useRef } from 'react';
 import { Animated, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Glass, IconCircle, MoodSwitch, Pill, T, Toggle, tap, thud } from '../components/ui';
+import { Glass, IconCircle, MoodSwitch, Pill, T, Toggle, tap, thud, Stagger } from '../components/ui';
 import { useTheme } from '../theme';
 import { profile, projects, skills } from '../data/profile';
 
@@ -26,7 +26,7 @@ export default function Home({ go, openGame }: Props) {
   };
 
   return (
-    <View>
+    <Stagger>
       {/* Толгой хэсэг */}
       <View style={styles.header}>
         <Pressable onPress={onAvatar} hitSlop={6}>
@@ -57,7 +57,7 @@ export default function Home({ go, openGame }: Props) {
         <View style={[styles.stats, { borderTopColor: theme.border }]}>
           <Stat value={`${skills.length}`} label="Skills" />
           <Stat value={`${projects.length}`} label="Projects" />
-          <Stat value="1" label="Game 🎮" />
+          <Stat value="3" label="Games 🎮" />
         </View>
       </Glass>
 
@@ -101,7 +101,7 @@ export default function Home({ go, openGame }: Props) {
       <T size={12} muted style={{ textAlign: 'center', marginTop: 22 }}>
         🤫 Нууц: утсаа сэгсэрээд үзээрэй…
       </T>
-    </View>
+    </Stagger>
   );
 }
 

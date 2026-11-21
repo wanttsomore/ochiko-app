@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Linking, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Glass, IconCircle, SectionTitle, SwipeButton, T, Toggle } from '../components/ui';
+import { Glass, IconCircle, SectionTitle, SwipeButton, T, Toggle, Stagger } from '../components/ui';
 import { useTheme } from '../theme';
 import { contacts, Contact as C, profile } from '../data/profile';
 
@@ -12,7 +12,7 @@ export default function Contact() {
   const email = contacts.find((c) => c.id === 'mail');
 
   return (
-    <View>
+    <Stagger>
       <SectionTitle kicker="Security & Access" title="Холбоо барих" />
 
       <Glass strong style={[styles.rowBetween, { marginBottom: 14 }]}>
@@ -45,7 +45,7 @@ export default function Contact() {
           />
         )}
       </Glass>
-    </View>
+    </Stagger>
   );
 }
 

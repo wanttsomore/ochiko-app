@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Glass, Pill, SectionTitle, T } from '../components/ui';
+import { Glass, Pill, SectionTitle, T, Stagger } from '../components/ui';
 import { useTheme } from '../theme';
 import { profile, skills, Skill } from '../data/profile';
 
@@ -13,14 +13,14 @@ const JOURNEY = [
   { lv: '2', title: 'HTML & CSS', text: '"Hello World" — анхны хуудсаа амилуулсан.' },
   { lv: '3', title: 'JavaScript', text: 'Логик, интерактив зүйл бичиж эхэлсэн.' },
   { lv: '4', title: 'C# — тоглоомын хэл', text: 'Тоглоом хийх зорилгоор сурч байна.' },
-  { lv: '5', title: 'React Native + Orb Rush', text: 'Яг одоо — анхны апп, анхны тоглоом!' },
+  { lv: '5', title: 'React Native + 3 тоглоом', text: 'Яг одоо — анхны апп, анхны 3 тоглоом!' },
   { lv: '?', title: 'Мөрөөдлийн тоглоом', text: '🔒 Удахгүй нээгдэнэ…' },
 ];
 
 export default function About() {
   const { theme } = useTheme();
   return (
-    <View>
+    <Stagger>
       <SectionTitle kicker="Living room" title="Миний тухай" />
 
       <Glass strong>
@@ -61,7 +61,7 @@ export default function About() {
           );
         })}
       </Glass>
-    </View>
+    </Stagger>
   );
 }
 

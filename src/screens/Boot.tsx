@@ -1,6 +1,6 @@
 // Нээх дэлгэц: "Ochiko OS" ачааллаж буй мэт анимэйшн, дараа нь гулсуулж нэвтэрнэ.
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, StyleSheet, View } from 'react-native';
+import { Animated, Easing, ImageSourcePropType, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Background, SwipeButton, T, tap } from '../components/ui';
 import { useTheme } from '../theme';
@@ -14,7 +14,7 @@ const LINES = [
   '> level up ready ✓',
 ];
 
-export default function Boot({ onDone }: { onDone: () => void }) {
+export default function Boot({ onDone, bg }: { onDone: () => void; bg?: ImageSourcePropType }) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const [shown, setShown] = useState(0);
@@ -36,7 +36,7 @@ export default function Boot({ onDone }: { onDone: () => void }) {
   const rotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
 
   return (
-    <Background>
+    <Background image={bg} dim={0.8}>
       <View style={[styles.wrap, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 30 }]}>
         <View style={{ alignItems: 'center' }}>
           <Animated.View style={[styles.ring, { borderColor: theme.accent, transform: [{ rotate }] }]}>

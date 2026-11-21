@@ -1,7 +1,7 @@
 // Ochiko OS — Д.Очиржанцаны портфолио апп (React Native + Expo)
-// Бүтэц: Boot (нээх дэлгэц) → 4 "өрөө" (Нүүр, Миний тухай, Бүтээлүүд, Холбоо) + нууц Game Room.
+// Бүтэц: Boot (нээх дэлгэц) → 4 "өрөө" (Нүүр, Миний тухай, Бүтээлүүд, Холбоо) + 3 тоглоом.
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Animated, Easing, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,13 +13,15 @@ import Home from './src/screens/Home';
 import About from './src/screens/About';
 import Projects from './src/screens/Projects';
 import Contact from './src/screens/Contact';
-import GameRoom from './src/screens/GameRoom';
+import GameHost, { GameId } from './src/games';
+import { photos } from './src/data/photos';
 
+// Таб бүр өөрийн арын зурагтай — солигдоход зураг crossfade хийнэ
 const TABS = [
-  { label: 'Нүүр', icon: 'home' },
-  { label: 'Тухай', icon: 'person' },
-  { label: 'Бүтээл', icon: 'albums' },
-  { label: 'Холбоо', icon: 'chatbubbles' },
+  { label: 'Нүүр', icon: 'home', bg: photos.home },
+  { label: 'Тухай', icon: 'person', bg: photos.about },
+  { label: 'Бүтээл', icon: 'game-controller', bg: photos.arcade },
+  { label: 'Холбоо', icon: 'chatbubbles', bg: photos.city },
 ] as const;
 
 export default function App() {
@@ -37,21 +39,32 @@ function Root() {
   const insets = useSafeAreaInsets();
   const [booted, setBooted] = useState(false);
   const [tab, setTab] = useState(0);
-  const [game, setGame] = useState(false);
+  const [game, setGame] = useState<GameId | null>(null);
   const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
   const fade = useRef(new Animated.Value(1)).current;
+  const slide = useRef(new Animated.Value(0)).current;
+  const busy = useRef(false);
 
-  // Утсаа сэгсрэхэд нууц тоглоом нээгдэнэ
-  useShake(() => { thud(); setGame(true); }, booted && !game);
+  // Утсаа сэгсрэхэд нууц тоглоом (Orb Rush) нээгдэнэ
+  useShake(() => { thud(); setGame('orb'); }, booted && !game);
 
-  // Таб солигдоход зөөлөн fade + дээш гүйлгэнэ
+  // Таб солих шилжилт: баруун таб руу бол зүүн тийш гулсаж гарна, шинэ нь баруунаас орж ирнэ
   const go = (i: number) => {
-    if (i === tab) return;
+    if (i === tab || busy.current) return;
+    busy.current = true;
     tap();
-    Animated.timing(fade, { toValue: 0, duration: 120, useNativeDriver: true }).start(() => {
+    const dir = i > tab ? 1 : -1;
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 0, duration: 140, useNativeDriver: true }),
+      Animated.timing(slide, { toValue: -dir * 40, duration: 140, easing: Easing.in(Easing.quad), useNativeDriver: true }),
+    ]).start(() => {
       setTab(i);
       scrollRef.current?.scrollTo({ y: 0, animated: false });
-      Animated.timing(fade, { toValue: 1, duration: 260, useNativeDriver: true }).start();
+      slide.setValue(dir * 60);
+      Animated.parallel([
+        Animated.timing(fade, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.spring(slide, { toValue: 0, friction: 9, tension: 70, useNativeDriver: true }),
+      ]).start(() => { busy.current = false; });
     });
   };
 
@@ -59,20 +72,20 @@ function Root() {
     return (
       <>
         <StatusBar style={theme.dark ? 'light' : 'dark'} />
-        <Boot onDone={() => setBooted(true)} />
+        <Boot onDone={() => setBooted(true)} bg={photos.home} />
       </>
     );
   }
 
   const screens = [
-    <Home key="h" go={go} openGame={() => setGame(true)} />,
+    <Home key="h" go={go} openGame={() => setGame('orb')} />,
     <About key="a" />,
-    <Projects key="p" openGame={() => setGame(true)} />,
+    <Projects key="p" openGame={(g) => setGame(g)} />,
     <Contact key="c" />,
   ];
 
   return (
-    <Background>
+    <Background image={TABS[tab].bg}>
       <StatusBar style={theme.dark ? 'light' : 'dark'} />
       <ScrollView
         ref={scrollRef}
@@ -80,14 +93,14 @@ function Root() {
         contentContainerStyle={[styles.content, { paddingTop: insets.top + 14, paddingBottom: insets.bottom + 120 }]}
       >
         <Animated.View
-          style={{ opacity: fade, transform: [{ translateY: fade.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}
+          style={{ opacity: fade, transform: [{ translateX: slide }] }}
         >
           {screens[tab]}
         </Animated.View>
       </ScrollView>
 
       <TabBar active={tab} onChange={go} bottom={insets.bottom} />
-      <GameRoom visible={game} onClose={() => setGame(false)} />
+      <GameHost game={game} onClose={() => setGame(null)} />
     </Background>
   );
 }
