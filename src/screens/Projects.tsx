@@ -5,11 +5,12 @@ import {
   Animated, Image, Linking, Modal, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, View, useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Glass, IconCircle, Pill, SectionTitle, SwipeButton, T, tap } from '../components/ui';
+import { Glass, IconCircle, Pill, SectionTitle, SwipeButton, T, tap, Stagger } from '../components/ui';
 import { useTheme } from '../theme';
 import { projects, Project } from '../data/profile';
+import type { GameId } from '../games';
 
-export default function Projects({ openGame }: { openGame: () => void }) {
+export default function Projects({ openGame }: { openGame: (g: GameId) => void }) {
   const { theme } = useTheme();
   const { width } = useWindowDimensions();
   const cardW = Math.min(width, 520) - 40; // дэлгэцийн өргөнөөс хамаарч карт томорно/жижгэрнэ
@@ -24,8 +25,8 @@ export default function Projects({ openGame }: { openGame: () => void }) {
   };
 
   return (
-    <View>
-      <SectionTitle kicker="Home CCTV" title="Бүтээлүүд" />
+    <Stagger>
+      <SectionTitle kicker="Arcade · 3 тоглоом" title="Бүтээлүүд" />
       <View style={styles.rowBetween}>
         <T size={13} muted>← Хуруугаараа гүйлгэ →</T>
         <T size={13} weight="700">{String(index + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}</T>
@@ -76,8 +77,8 @@ export default function Projects({ openGame }: { openGame: () => void }) {
         ))}
       </View>
 
-      <ProjectSheet p={open} onClose={() => setOpen(null)} onPlay={() => { setOpen(null); setTimeout(openGame, 350); }} />
-    </View>
+      <ProjectSheet p={open} onClose={() => setOpen(null)} onPlay={(g) => { setOpen(null); setTimeout(() => openGame(g), 350); }} />
+    </Stagger>
   );
 }
 
@@ -96,13 +97,13 @@ function CamCard({ p, cam, h, onPress }: { p: Project; cam: number; h: number; o
           </View>
           <T size={12} color="rgba(255,255,255,0.7)">{p.stack.join(' · ')}</T>
         </View>
-        <View style={styles.camArrow}><Ionicons name="chevron-forward" size={18} color="#fff" /></View>
+        <View style={styles.camArrow}><Ionicons name={p.game ? 'play' : p.status === 'Locked' ? 'lock-closed' : 'chevron-forward'} size={18} color="#fff" /></View>
       </View>
     </Pressable>
   );
 }
 
-function ProjectSheet({ p, onClose, onPlay }: { p: Project | null; onClose: () => void; onPlay: () => void }) {
+function ProjectSheet({ p, onClose, onPlay }: { p: Project | null; onClose: () => void; onPlay: (g: GameId) => void }) {
   const { theme } = useTheme();
   const { width } = useWindowDimensions();
   const imgH = (Math.min(width, 560) - 40) / 1.5; // 3:2 харьцаа
@@ -125,8 +126,8 @@ function ProjectSheet({ p, onClose, onPlay }: { p: Project | null; onClose: () =
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 22 }}>
               {p.stack.map((s) => <Pill key={s} label={s} icon="code-slash" />)}
             </View>
-            {p.action === 'game' ? (
-              <SwipeButton label="Гулсуулж тоглох" icon="game-controller" onComplete={onPlay} />
+            {p.game ? (
+              <SwipeButton label="Гулсуулж тоглох" icon="game-controller" onComplete={() => onPlay(p.game!)} />
             ) : p.status === 'Locked' ? (
               <SwipeButton label="Зөвлөгөө өгөх" icon="mail" onComplete={() => Linking.openURL(p.link)} />
             ) : (

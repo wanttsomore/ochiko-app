@@ -12,7 +12,7 @@ export const profile = {
   studentId: 'B23FA1235',
   role: 'Aspiring Game Developer',
   // Нүүр дэлгэцийн нэг өгүүлбэр
-  tagline: 'Өөрийн тоглоомоо бүтээхийг мөрөөддөг — анхны алхмаа яг энэ апп дотор хийлээ.',
+  tagline: 'Өөрийн тоглоомоо бүтээхийг мөрөөддөг — анхны 3 тоглоомоо яг энэ апп дотор хийлээ.',
   school: 'Санхүү Эдийн Засгийн Их Сургууль · 4-р курс',
   major: 'Мэдээллийн систем',
   bio:
@@ -48,64 +48,80 @@ export type Project = {
   image: ImageSourcePropType;
   link: string;
   status: 'Live' | 'Building' | 'Done' | 'Locked';
-  action?: 'game'; // 'game' бол холбоос биш, апп доторх тоглоомыг нээнэ
+  game?: 'orb' | 'space' | 'snake'; // байвал холбоос биш, апп доторх тоглоомыг нээнэ
 };
 
-// Хамгийн багадаа 3 бүтээл. Хичээлийн төсөл байж болно.
-// TODO: 3-р бүтээлийг өөрийн хийсэн хичээлийн төсөл, зураг (assets/projects/p3.jpg), холбоосоор солиорой.
+// Хамгийн багадаа 3 бүтээл → апп дотор шууд тоглогддог 3 жижиг тоглоом + энэ апп + мөрөөдлийн тоглоом.
 export const projects: Project[] = [
   {
-    id: 'p1',
+    id: 'orb',
     title: 'Orb Rush',
-    tag: 'Анхны тоглоом',
-    stack: ['React Native', 'Accelerometer', 'Game loop'],
-    short: 'Миний бүтээсэн хамгийн анхны тоглоом 🎮',
+    tag: 'Game 01 · Tilt',
+    stack: ['React Native', 'Accelerometer', 'Physics'],
+    short: 'Утсаа хазайлгаж тоглодог миний анхны тоглоом',
     description:
-      'Тоглоом хийхийг мөрөөддөг надад энэ бол анхны жинхэнэ алхам. Утсаа хазайлгаж бөмбөгөө ' +
-      'удирдаад орб цуглуулж, bug-аас зайлсхийнэ. Game loop (requestAnimationFrame), мөргөлдөөн ' +
-      'шалгах, физик (хурд, үрэлт, хананаас ойх), оноо, рекордыг өөрөө бичсэн. Апп дотор нууцаар байрладаг!',
-    image: require('../../assets/projects/p1.jpg'),
+      'Утсаа хазайлгаж цагаан бөмбөгөө өнхрүүлээд улбар шар орб цуглуулна, 🐞 bug-аас зайлсхийнэ. ' +
+      'Accelerometer-ийн утгаар хүч → хурд → байрлалыг тооцож, үрэлт, хананаас ойх физикийг өөрөө бичсэн. ' +
+      'Bug оноо ахих тусам хурдасдаг. 20 секундын дотор хамгийн их оноо цуглуул!',
+    image: require('../../assets/projects/orb.jpg'),
     link: 'https://github.com/', // TODO
     status: 'Live',
-    action: 'game',
+    game: 'orb',
   },
   {
-    id: 'p2',
+    id: 'space',
+    title: 'Space Dodger',
+    tag: 'Game 02 · Arcade',
+    stack: ['React Native', 'Game loop', 'Collision'],
+    short: 'Солируудын дундуур нисэх сансрын тоглоом',
+    description:
+      'Сансрын хөлгөө утсаа хазайлгаж эсвэл хуруугаараа чирж удирдана. Дээрээс санамсаргүй хэмжээ, ' +
+      'хурдтай солир унаж, хугацаа өнгөрөх тусам хүндэрнэ. Тойрог-тойргийн мөргөлдөөн шалгалт, ' +
+      'parallax од, 3 амь, мөргөсний дараах түр хамгаалалт (invincibility) хэрэгжүүлсэн.',
+    image: require('../../assets/projects/space.jpg'),
+    link: 'https://github.com/', // TODO
+    status: 'Live',
+    game: 'space',
+  },
+  {
+    id: 'snake',
+    title: 'Snake',
+    tag: 'Game 03 · Swipe',
+    stack: ['React Native', 'PanResponder', 'Grid logic'],
+    short: 'Swipe-аар удирддаг сонгодог могой',
+    description:
+      'Хуруугаа дэлгэц дээр гүйлгэж (swipe) могойгоо эргүүлдэг сонгодог Snake. Тор (grid) дээр ' +
+      'суурилсан хөдөлгөөн, хоол идэх бүрт урт нэмэгдэж хурдсах, хана болон өөрийгөө мөргөх шалгалт, ' +
+      'эсрэг чиглэл рүү шууд эргэхийг хориглох логиктой.',
+    image: require('../../assets/projects/snake.jpg'),
+    link: 'https://github.com/', // TODO
+    status: 'Live',
+    game: 'snake',
+  },
+  {
+    id: 'app',
     title: 'Ochiko OS',
-    tag: 'Mobile',
+    tag: 'Mobile app',
     stack: ['React Native', 'Expo', 'Sensors', 'Haptics'],
     short: 'Яг одоо үзэж буй энэ портфолио апп',
     description:
-      'Ухаалаг гэрийн удирдлагын самбар хэлбэртэй портфолио апп. Хазайлтын мэдрэгчээр parallax, ' +
-      'сэгсрэх үйлдлээр нууц өрөө, haptic чичиргээ, swipe gesture, dark/light горим ашигласан.',
-    image: require('../../assets/projects/p4.jpg'),
+      'Ухаалаг гэрийн удирдлагын самбар хэлбэртэй портфолио апп. Хазайлтын parallax, сэгсрэх үйлдлээр ' +
+      'нууц тоглоом, haptic чичиргээ, swipe gesture, dark/light горим, зураг солигдох crossfade ашигласан.',
+    image: require('../../assets/projects/app.jpg'),
     link: 'https://github.com/', // TODO: энэ репогийн холбоос
     status: 'Live',
   },
   {
-    id: 'p3',
-    title: 'Хичээлийн вэб төсөл',
-    tag: 'Web',
-    stack: ['HTML', 'CSS', 'JavaScript'],
-    short: 'TODO: өөрийн хичээлийн төслөөр солих',
-    description:
-      'TODO: Энд хичээл дээр хийсэн HTML/CSS/JavaScript төслөө товч тайлбарлана — юу хийдэг, ' +
-      'ямар асуудал шийддэг, та ямар хэсгийг нь хийсэн бэ.',
-    image: require('../../assets/projects/p3.jpg'),
-    link: 'https://github.com/', // TODO
-    status: 'Done',
-  },
-  {
-    id: 'p4',
+    id: 'dream',
     title: 'Мөрөөдлийн тоглоом',
     tag: 'Coming soon',
     stack: ['C#', 'Unity', 'Game design'],
     short: 'Хараахан түгжээтэй түвшин 🔒',
     description:
-      'Энэ бол миний хамгийн том мөрөөдөл — өөрийн гэсэн тоглоом. C# сурч, Unity хөдөлгүүртэй ' +
-      'танилцаж байгаа бөгөөд энэ түвшин удахгүй нээгдэнэ. Хамтран ажиллах, зөвлөгөө өгөх хүсэлтэй ' +
-      'бол надтай холбогдоорой!',
-    image: require('../../assets/projects/p2.jpg'),
+      'Энэ бол миний хамгийн том мөрөөдөл — өөрийн гэсэн бүрэн хэмжээний тоглоом. C# сурч, Unity ' +
+      'хөдөлгүүртэй танилцаж байгаа бөгөөд энэ түвшин удахгүй нээгдэнэ. Хамтран ажиллах, зөвлөгөө ' +
+      'өгөх хүсэлтэй бол надтай холбогдоорой!',
+    image: require('../../assets/projects/dream.jpg'),
     link: 'mailto:b23fa1235@ufe.edu.mn',
     status: 'Locked',
   },
