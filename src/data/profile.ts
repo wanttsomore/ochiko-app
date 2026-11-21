@@ -10,17 +10,20 @@ export const profile = {
   name: 'Д.Очиржанцан',
   nickname: 'Ochiko',
   studentId: 'B23FA1235',
-  role: 'Aspiring Game Developer',
+  role: 'Game Developer болох замд',
   // Нүүр дэлгэцийн нэг өгүүлбэр
-  tagline: 'Өөрийн тоглоомоо бүтээхийг мөрөөддөг — анхны 3 тоглоомоо яг энэ апп дотор хийлээ.',
+  tagline: 'Монголын түүхийг дэлхийд тоглоомоор таниулахыг мөрөөддөг.',
   school: 'Санхүү Эдийн Засгийн Их Сургууль · 4-р курс',
   major: 'Мэдээллийн систем',
-  bio:
-    'Сайн байна уу! Би Очиржанцан, СЭЗИС-ийн Мэдээллийн систем мэргэжлийн 4-р курсийн оюутан. ' +
-    'Тоглоом тоглохдоо "энэ яаж хийгддэг юм бол?" гэж үргэлж боддог байсан. Тэгээд нэг өдөр ' +
-    'өөрийн тоглоомоо бүтээнэ гэж мөрөөддөг болсон. Одоогоор HTML, CSS, JavaScript, C#, React Native сурч, ' +
-    'тэр мөрөөдөл рүүгээ алхам алхмаар ойртож байна.',
-  interests: ['Тоглоом хөгжүүлэлт', 'Game design', 'Тоглоом тоглох', 'UI/UX'],
+  // Товч намтар — богино, тодорхой
+  story: [
+    'Counter-Strike-ээр эхэлсэн тоглоомын хобби минь GTA, Ghost of Tsushima хүртэл үргэлжилсэн.',
+    'Тэгээд нэг бодол төрсөн: Монголын түүхээр ийм хэмжээний тоглоом байвал ямар вэ?',
+    'Тэр өдрөөс хойш тоглоом бүтээх мөрөөдөлтэй болж, программчлал сурч эхэлсэн.',
+  ],
+  // Тоглож үзсэн тоглоомууд — замнал
+  played: ['Counter-Strike', 'GTA', 'Ghost of Tsushima'],
+  interests: ['Тоглоом хөгжүүлэлт', 'Монголын түүх', 'Game design'],
 };
 
 export type Skill = {
@@ -47,11 +50,11 @@ export type Project = {
   description: string;
   image: ImageSourcePropType;
   link: string;
-  status: 'Live' | 'Building' | 'Done' | 'Locked';
+  status: 'Live' | 'Building' | 'Done';
   game?: 'orb' | 'space' | 'snake'; // байвал холбоос биш, апп доторх тоглоомыг нээнэ
 };
 
-// Хамгийн багадаа 3 бүтээл → апп дотор шууд тоглогддог 3 жижиг тоглоом + энэ апп + мөрөөдлийн тоглоом.
+// Хамгийн багадаа 3 бүтээл → апп дотор шууд тоглогддог 3 жижиг тоглоом.
 export const projects: Project[] = [
   {
     id: 'orb',
@@ -60,9 +63,9 @@ export const projects: Project[] = [
     stack: ['React Native', 'Accelerometer', 'Physics'],
     short: 'Утсаа хазайлгаж тоглодог миний анхны тоглоом',
     description:
-      'Утсаа хазайлгаж цагаан бөмбөгөө өнхрүүлээд улбар шар орб цуглуулна, 🐞 bug-аас зайлсхийнэ. ' +
+      'Утсаа хазайлгаж цагаан бөмбөгөө өнхрүүлээд улбар шар орб цуглуулж, улаан хорхойноос зайлсхийнэ. ' +
       'Accelerometer-ийн утгаар хүч → хурд → байрлалыг тооцож, үрэлт, хананаас ойх физикийг өөрөө бичсэн. ' +
-      'Bug оноо ахих тусам хурдасдаг. 20 секундын дотор хамгийн их оноо цуглуул!',
+      'Хорхой оноо ахих тусам хурдасдаг. 20 секундын дотор хамгийн их оноо цуглуул!',
     image: require('../../assets/projects/orb.jpg'),
     link: 'https://github.com/', // TODO
     status: 'Live',
@@ -98,33 +101,6 @@ export const projects: Project[] = [
     status: 'Live',
     game: 'snake',
   },
-  {
-    id: 'app',
-    title: 'Ochiko OS',
-    tag: 'Mobile app',
-    stack: ['React Native', 'Expo', 'Sensors', 'Haptics'],
-    short: 'Яг одоо үзэж буй энэ портфолио апп',
-    description:
-      'Ухаалаг гэрийн удирдлагын самбар хэлбэртэй портфолио апп. Хазайлтын parallax, сэгсрэх үйлдлээр ' +
-      'нууц тоглоом, haptic чичиргээ, swipe gesture, dark/light горим, зураг солигдох crossfade ашигласан.',
-    image: require('../../assets/projects/app.jpg'),
-    link: 'https://github.com/', // TODO: энэ репогийн холбоос
-    status: 'Live',
-  },
-  {
-    id: 'dream',
-    title: 'Мөрөөдлийн тоглоом',
-    tag: 'Coming soon',
-    stack: ['C#', 'Unity', 'Game design'],
-    short: 'Хараахан түгжээтэй түвшин 🔒',
-    description:
-      'Энэ бол миний хамгийн том мөрөөдөл — өөрийн гэсэн бүрэн хэмжээний тоглоом. C# сурч, Unity ' +
-      'хөдөлгүүртэй танилцаж байгаа бөгөөд энэ түвшин удахгүй нээгдэнэ. Хамтран ажиллах, зөвлөгөө ' +
-      'өгөх хүсэлтэй бол надтай холбогдоорой!',
-    image: require('../../assets/projects/dream.jpg'),
-    link: 'mailto:b23fa1235@ufe.edu.mn',
-    status: 'Locked',
-  },
 ];
 
 export type Contact = {
@@ -135,11 +111,11 @@ export type Contact = {
   url: string;
 };
 
-// TODO: Өөрийн имэйл, утас, GitHub, сошиал хаягаар солино уу.
+// TODO: имэйл болон GitHub хаягаа шалгаж, зөв эсэхийг баталгаажуулаарай.
 export const contacts: Contact[] = [
+  { id: 'phone', label: 'Утас', value: '8096 1929', icon: 'call', url: 'tel:+97680961929' },
+  { id: 'ig', label: 'Instagram', value: '@oji_lnn', icon: 'logo-instagram', url: 'https://instagram.com/oji_lnn' },
+  { id: 'fb', label: 'Facebook', value: 'oji_ln', icon: 'logo-facebook', url: 'https://facebook.com/oji_ln' },
   { id: 'mail', label: 'Имэйл', value: 'b23fa1235@ufe.edu.mn', icon: 'mail', url: 'mailto:b23fa1235@ufe.edu.mn' },
-  { id: 'phone', label: 'Утас', value: '+976 9900 0000', icon: 'call', url: 'tel:+97699000000' },
-  { id: 'github', label: 'GitHub', value: 'github.com/ochiko', icon: 'logo-github', url: 'https://github.com/' },
-  { id: 'fb', label: 'Facebook', value: 'fb.com/ochiko', icon: 'logo-facebook', url: 'https://facebook.com/' },
-  { id: 'ig', label: 'Instagram', value: '@ochiko.dev', icon: 'logo-instagram', url: 'https://instagram.com/' },
+  { id: 'github', label: 'GitHub', value: 'github.com', icon: 'logo-github', url: 'https://github.com/' },
 ];
