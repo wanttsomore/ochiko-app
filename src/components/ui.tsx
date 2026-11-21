@@ -1,7 +1,7 @@
 // Hume дизайнаас санаа авсан дахин ашиглагдах UI бүрэлдэхүүнүүд.
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Animated, Easing, ImageSourcePropType, PanResponder, Pressable, StyleSheet, Text, View, ViewStyle, StyleProp, LayoutChangeEvent,
+  Animated, Easing, ImageSourcePropType, Pressable, StyleSheet, Text, View, ViewStyle, StyleProp, LayoutChangeEvent,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -122,7 +122,7 @@ export function Glass({
 export function T({
   children, size = 15, weight = '400', muted, color, style, numberOfLines,
 }: {
-  children: React.ReactNode; size?: number; weight?: '400' | '500' | '600' | '700' | '800';
+  children: React.ReactNode; size?: number; weight?: '400' | '500' | '600' | '700' | '800' | '900';
   muted?: boolean; color?: string; style?: any; numberOfLines?: number;
 }) {
   const { theme } = useTheme();
@@ -237,46 +237,31 @@ export function MoodSwitch() {
   );
 }
 
-// ---------- ">>>" гулсуулж идэвхжүүлэх товч ----------
-export function SwipeButton({ label, icon = 'settings', onComplete }: { label: string; icon?: any; onComplete: () => void }) {
+// ---------- Энгийн товч (дарахад агшиж, чичирнэ) ----------
+export function Button({ label, icon, onPress, kind = 'primary', style }: {
+  label: string; icon?: any; onPress: () => void; kind?: 'primary' | 'ghost'; style?: StyleProp<ViewStyle>;
+}) {
   const { theme } = useTheme();
-  const [w, setW] = React.useState(0);
-  const x = useRef(new Animated.Value(0)).current;
-  const max = Math.max(0, w - 56);
-  const maxRef = useRef(max);
-  maxRef.current = max;
-  const doneRef = useRef(onComplete);
-  doneRef.current = onComplete;
-
-  const pan = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => tap(),
-      onPanResponderMove: (_, g) => x.setValue(Math.max(0, Math.min(maxRef.current, g.dx))),
-      onPanResponderRelease: (_, g) => {
-        // Хуруугаа 75%-иас цааш гулсуулбал үйлдэл ажиллана
-        if (g.dx > maxRef.current * 0.75) {
-          success();
-          Animated.timing(x, { toValue: maxRef.current, duration: 120, useNativeDriver: true }).start(() => {
-            doneRef.current();
-            Animated.spring(x, { toValue: 0, useNativeDriver: true }).start();
-          });
-        } else {
-          Animated.spring(x, { toValue: 0, useNativeDriver: true }).start();
-        }
-      },
-    }),
-  ).current;
-
+  const scale = useRef(new Animated.Value(1)).current;
+  const primary = kind === 'primary';
   return (
-    <View onLayout={(e) => setW(e.nativeEvent.layout.width)} style={[styles.swipe, { backgroundColor: theme.accent }]}>
-      <T size={15} weight="700" color="#fff" style={{ textAlign: 'center', flex: 1, marginLeft: 44 }}>{label}</T>
-      <T size={18} weight="700" color="rgba(255,255,255,0.7)" style={{ marginRight: 18 }}>›››</T>
-      <Animated.View {...pan.panHandlers} style={[styles.swipeKnob, { transform: [{ translateX: x }] }]}>
-        <Ionicons name={icon} size={20} color={theme.accent} />
+    <Pressable
+      onPress={() => { tap(); onPress(); }}
+      onPressIn={() => Animated.spring(scale, { toValue: 0.95, useNativeDriver: true }).start()}
+      onPressOut={() => Animated.spring(scale, { toValue: 1, friction: 4, useNativeDriver: true }).start()}
+      style={style}
+    >
+      <Animated.View
+        style={{
+          height: 54, borderRadius: 27, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 22,
+          backgroundColor: primary ? theme.accent : theme.glassStrong, borderWidth: primary ? 0 : 1, borderColor: theme.border,
+          transform: [{ scale }],
+        }}
+      >
+        {icon && <Ionicons name={icon} size={18} color={primary ? '#fff' : theme.text} style={{ marginRight: 8 }} />}
+        <T size={15} weight="700" color={primary ? '#fff' : theme.text}>{label}</T>
       </Animated.View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -300,6 +285,4 @@ const styles = StyleSheet.create({
   segment: { flexDirection: 'row', borderRadius: 24, borderWidth: 1, padding: 4, height: 52 },
   segThumb: { position: 'absolute', top: 4, left: 4, bottom: 4, borderRadius: 20, borderWidth: 1 },
   segItem: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  swipe: { height: 60, borderRadius: 30, flexDirection: 'row', alignItems: 'center', overflow: 'hidden' },
-  swipeKnob: { position: 'absolute', left: 4, width: 52, height: 52, borderRadius: 26, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
 });

@@ -6,4 +6,7 @@ export const photos = {
   space: require('../../assets/photos/space.jpg'),
   retro: require('../../assets/photos/retro.jpg'),
   city: require('../../assets/photos/city.jpg'),
+  steppe: require('../../assets/photos/steppe.jpg'),
+  ger: require('../../assets/photos/ger.jpg'),
+  dream: require('../../assets/photos/dream.jpg'),
 };
