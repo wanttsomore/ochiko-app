@@ -4,7 +4,7 @@
 > **Д.Очиржанцан** · Оюутны код **B23FA1235**
 > Санхүү Эдийн Засгийн Их Сургууль · Мэдээллийн систем · 4-р курс
 
-Counter-Strike-ээр эхэлсэн тоглоомын хобби минь GTA, Ghost of Tsushima хүртэл үргэлжилсэн. Тэгээд нэг бодол төрсөн: *Монголын түүхээр ийм хэмжээний тоглоом байвал ямар вэ?* Тэр өдрөөс тоглоом бүтээх мөрөөдөлтэй болсон.
+Counter-Strike-ээр эхэлж, GTA, Ghost of Tsushima зэрэг тоглоомуудыг тоглож өссөн. **Ghost of Yōtei, Red Dead Redemption 2 шиг өргөн ертөнцтэй, Монголын түүхэн дээр суурилсан тоглоом бүтээх нь миний мөрөөдөл.** Вэб хийх гэж HTML, CSS-ээс эхэлж, JavaScript, C# сурсан бөгөөд одоо React Native сурч байна.
 
 Тиймээс энэ портфолиог **тоглоом** хэлбэрээр хийсэн (удирдамжийн **Санаа 03**). Монголын тал нутгаар морьтой аялж, түвшин бүрт хүрэх тусам миний түүх, ур чадвар, бүтээлүүд нээгдэнэ. Хамгийн сүүлд сүлдний дэргэд мөрөөдөл маань нээгдэнэ.
 
@@ -24,12 +24,12 @@ Counter-Strike-ээр эхэлсэн тоглоомын хобби минь GTA,
 | LV | Газар | Агуулга |
 |---|---|---|
 | 1 | Самбар | Танилцуулга: нэр, чиглэл, сургууль, хэрхэн тоглох |
-| 2 | Гэр | Миний түүх: CS → GTA → Ghost of Tsushima → миний тоглоом |
+| 2 | Гэр | Миний тухай: тоглосон тоглоомууд, замнал HTML/CSS → JavaScript → C# → React Native → тоглоом хөгжүүлэлт |
 | 3 | Гэр | Ур чадвар: HTML, CSS, JavaScript, C#, React Native |
 | 4 | Гэр | **Orb Rush** — утсаа хазайлгаж тоглодог тоглоом |
 | 5 | Гэр | **Space Dodger** — солироос зугтах тоглоом |
-| 6 | Гэр | **Snake** — swipe-аар удирддаг могой |
-| 7 | Овоо | Холбоо барих: утас, Instagram, Facebook, имэйл, GitHub |
+| 6 | Гэр | **Snake** — сум товч эсвэл swipe-аар удирддаг могой |
+| 7 | Овоо | Холбоо барих: утас, Instagram (@oji_lnn), Facebook, имэйл, GitHub (wanttsomore) |
 | 8 | Сүлд | Мөрөөдөл: Монголын түүхэн тоглоом |
 
 Түвшин бүрийг дуусгах хүртэл замын хаалт нээгдэхгүй. Тоглоомын түвшинд тухайн тоглоомыг нэг удаа тоглож дуусгах хэрэгтэй. Түвшин дуусах бүрт **LEVEL UP** гарч, XP мөр дүүрнэ.
@@ -44,18 +44,18 @@ Counter-Strike-ээр эхэлсэн тоглоомын хобби минь GTA,
 
 ## Бүтээлч шийдлүүд
 
-- **Parallax тал нутаг** — 4 давхарга уул өөр өөр хурдаар хөдөлж гүн мэдрэмж өгнө (`World.tsx → layer()`)
-- **Кодоор зурсан дүрс** — морьтон, гэр, овоо, сүлд, хаалт бүгд `react-native-svg` (`Scenery.tsx`, `Rider.tsx`); emoji, бэлэн зураг ашиглаагүй
-- **Морины хөлийн анимэйшн** — 4 хөл фазын зөрүүтэйгээр `Animated.loop`-оор эргэнэ
+- **Пиксел арт** — морьтон (6 фреймтэй давхих анимэйшн), гэр, мод, бут, мөөг, хонь, овоо, сүлд бүгдийг `scripts/sprites/*.py` кодоор пиксел бүрээр зурсан; emoji, бэлэн зураг ашиглаагүй. Дахин үүсгэх: `sh scripts/sprites/generate.sh`
+- **Амьд тал нутаг** — өвс зулгааж буй хонь, санамсаргүй (тогтмол seed) байрлалтай мод, бут, цэцэг
+- **Тоглоомын удирдлага** — 3 тоглоомд сум товч (D-pad) нэмсэн
 - **Game loop** — `requestAnimationFrame` дээр байрлал, камер, ойр байгаа түвшинг тооцно; React state-ийг зөвхөн өөрчлөгдөхөд шинэчилнэ
 - **Түвшний түгжээ, XP, LEVEL UP** — дуусгасан түвшний жагсаалтаас хаалтын байрлалыг тооцно
-- **Улирал** — Warm = үдэш, Neutral = өдөр, Cold = өвөл, мөн шөнө (`palette.ts`)
+- **Өдөр / шөнө** — шөнө тал нутаг харанхуйлж, гэрийн хаалга гэрэлтэнэ
 - **3-2-1 тоолол** — тоглоом бүр эхлэхдээ тоолно (`GameFrame.tsx`)
 - **Haptic чичиргээ** — давхих, түвшинд ойртох, LEVEL UP, хаалт мөргөх бүрт
 
 ## Ашигласан сангууд
 
-`expo`, `react-native`, TypeScript, `react-native-svg`, `expo-sensors` (Accelerometer), `expo-haptics`, `expo-linear-gradient`, `react-native-safe-area-context`, `@expo/vector-icons`. Navigation сан ашиглаагүй.
+`expo`, `react-native`, TypeScript, `expo-sensors` (Accelerometer), `expo-haptics`, `expo-linear-gradient`, `react-native-safe-area-context`, `@expo/vector-icons`. Navigation сан ашиглаагүй.
 
 ## Бүтэц
 
@@ -63,10 +63,10 @@ Counter-Strike-ээр эхэлсэн тоглоомын хобби минь GTA,
 App.tsx                  # Boot → World
 src/world/World.tsx      # Тоглоомын ертөнц: game loop, камер, HUD, удирдлага
 src/world/levels.ts      # 8 түвшний тодорхойлолт
-src/world/Scenery.tsx    # Уул, гэр, овоо, сүлд (SVG)
-src/world/Rider.tsx      # Морьтон дүр + анимэйшн
+src/world/sprites.ts     # Пиксел арт зургийн жагсаалт
+src/world/Rider.tsx      # Морьтоны фрейм анимэйшн
+scripts/sprites/         # Пиксел арт зурдаг Python код (pixel.py, horse.py, props.py)
 src/world/Panels.tsx     # Түвшин бүрийн самбар
-src/world/palette.ts     # Улирал, өдөр/шөнийн өнгө
 src/games/               # Orb Rush, Space Dodger, Snake + GameFrame
 src/data/profile.ts      # Бүх хувийн мэдээлэл
 ```
@@ -85,6 +85,7 @@ APK: `npm i -g eas-cli` → `eas login` → `eas build -p android --profile prev
 
 ## Эх сурвалж
 
+- Пиксел артын хэв маяг: интернэт дэх пиксел морь, хүрээтэй тосгоны зургаас санаа авч, бүх дүрсийг өөрөө кодоор зурсан.
 - Шилэн картын хэв маяг: Dribbble — [Hume Smart Home](https://dribbble.com/shots/26559633-Hume-Mobile-App-Design-for-Smart-Home) (Phenomenon Studio)-оос санаа авсан.
 - Зургууд: [Unsplash](https://unsplash.com) (Unsplash License) — холбоосууд `scripts/download-photos.js` дотор.
 - AI хэрэгслийн тусламж авсан (хичээлийн журмаар зөвшөөрөгдсөн). Бүх кодыг ойлгож, тайлбарлаж чадна.

@@ -15,14 +15,22 @@ export const profile = {
   tagline: 'Монголын түүхийг дэлхийд тоглоомоор таниулахыг мөрөөддөг.',
   school: 'Санхүү Эдийн Засгийн Их Сургууль · 4-р курс',
   major: 'Мэдээллийн систем',
-  // Товч намтар — богино, тодорхой
+  // Товч танилцуулга — богино, тодорхой
   story: [
-    'Counter-Strike-ээр эхэлсэн тоглоомын хобби минь GTA, Ghost of Tsushima хүртэл үргэлжилсэн.',
-    'Тэгээд нэг бодол төрсөн: Монголын түүхээр ийм хэмжээний тоглоом байвал ямар вэ?',
-    'Тэр өдрөөс хойш тоглоом бүтээх мөрөөдөлтэй болж, программчлал сурч эхэлсэн.',
+    'Counter-Strike-ээр эхэлж, GTA, Ghost of Tsushima зэрэг тоглоомуудыг тоглож өссөн.',
+    'Ghost of Yōtei, Red Dead Redemption 2 шиг өргөн ертөнцтэй, Монголын түүхэн дээр суурилсан тоглоом бүтээх нь миний мөрөөдөл.',
+    'Тэр мөрөөдөлдөө хүрэхийн тулд программчлалыг алхам алхмаар сурч байна.',
   ],
-  // Тоглож үзсэн тоглоомууд — замнал
+  // Тоглосон тоглоомууд
   played: ['Counter-Strike', 'GTA', 'Ghost of Tsushima'],
+  // Сурсан замнал — тоглоомын түвшин шиг
+  journey: [
+    { title: 'HTML, CSS', text: 'Вэб хуудас хийх гэж эхэлсэн. Хуудасны бүтэц, өнгө, байрлал, responsive загвар хийж сурсан.', icon: 'logo-html5', state: 'done' },
+    { title: 'JavaScript', text: 'Хуудсандаа логик, товч, хөдөлгөөн нэмж, программчлалын үндсэн ойлголтуудыг эзэмшсэн.', icon: 'logo-javascript', state: 'done' },
+    { title: 'C#', text: 'Тоглоомын хөдөлгүүр Unity-д хэрэглэгддэг хэл учраас OOP, C#-ийг сурч эхэлсэн.', icon: 'code-slash', state: 'done' },
+    { title: 'React Native', text: 'Одоо мобайл апп хийж сурч байна. Энэ апп болон доторх 3 жижиг тоглоом нь анхны үр дүн.', icon: 'logo-react', state: 'now' },
+    { title: 'Тоглоом хөгжүүлэлт', text: 'Ирээдүйд Unity, C# ашиглан Монголын түүхэн тоглоомоо бүтээнэ.', icon: 'flag', state: 'next' },
+  ] as { title: string; text: string; icon: string; state: 'done' | 'now' | 'next' }[],
   interests: ['Тоглоом хөгжүүлэлт', 'Монголын түүх', 'Game design'],
 };
 
@@ -67,7 +75,7 @@ export const projects: Project[] = [
       'Accelerometer-ийн утгаар хүч → хурд → байрлалыг тооцож, үрэлт, хананаас ойх физикийг өөрөө бичсэн. ' +
       'Хорхой оноо ахих тусам хурдасдаг. 20 секундын дотор хамгийн их оноо цуглуул!',
     image: require('../../assets/projects/orb.jpg'),
-    link: 'https://github.com/', // TODO
+    link: 'https://github.com/wanttsomore',
     status: 'Live',
     game: 'orb',
   },
@@ -82,7 +90,7 @@ export const projects: Project[] = [
       'хурдтай солир унаж, хугацаа өнгөрөх тусам хүндэрнэ. Тойрог-тойргийн мөргөлдөөн шалгалт, ' +
       'parallax од, 3 амь, мөргөсний дараах түр хамгаалалт (invincibility) хэрэгжүүлсэн.',
     image: require('../../assets/projects/space.jpg'),
-    link: 'https://github.com/', // TODO
+    link: 'https://github.com/wanttsomore',
     status: 'Live',
     game: 'space',
   },
@@ -97,7 +105,7 @@ export const projects: Project[] = [
       'суурилсан хөдөлгөөн, хоол идэх бүрт урт нэмэгдэж хурдсах, хана болон өөрийгөө мөргөх шалгалт, ' +
       'эсрэг чиглэл рүү шууд эргэхийг хориглох логиктой.',
     image: require('../../assets/projects/snake.jpg'),
-    link: 'https://github.com/', // TODO
+    link: 'https://github.com/wanttsomore',
     status: 'Live',
     game: 'snake',
   },
@@ -111,11 +119,11 @@ export type Contact = {
   url: string;
 };
 
-// TODO: имэйл болон GitHub хаягаа шалгаж, зөв эсэхийг баталгаажуулаарай.
+// TODO: имэйл хаягаа шалгаж, зөв эсэхийг баталгаажуулаарай.
 export const contacts: Contact[] = [
   { id: 'phone', label: 'Утас', value: '8096 1929', icon: 'call', url: 'tel:+97680961929' },
-  { id: 'ig', label: 'Instagram', value: '@oji_lnn', icon: 'logo-instagram', url: 'https://instagram.com/oji_lnn' },
-  { id: 'fb', label: 'Facebook', value: 'oji_ln', icon: 'logo-facebook', url: 'https://facebook.com/oji_ln' },
+  { id: 'ig', label: 'Instagram', value: '@oji_lnn', icon: 'logo-instagram', url: 'https://www.instagram.com/oji_lnn' },
+  { id: 'fb', label: 'Facebook', value: 'ochir.jantsan.39', icon: 'logo-facebook', url: 'https://www.facebook.com/ochir.jantsan.39/' },
   { id: 'mail', label: 'Имэйл', value: 'b23fa1235@ufe.edu.mn', icon: 'mail', url: 'mailto:b23fa1235@ufe.edu.mn' },
-  { id: 'github', label: 'GitHub', value: 'github.com', icon: 'logo-github', url: 'https://github.com/' },
+  { id: 'github', label: 'GitHub', value: 'wanttsomore', icon: 'logo-github', url: 'https://github.com/wanttsomore' },
 ];
