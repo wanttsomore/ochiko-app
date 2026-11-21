@@ -1,7 +1,7 @@
 // Hume дизайнаас санаа авсан дахин ашиглагдах UI бүрэлдэхүүнүүд.
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  Animated, PanResponder, Pressable, StyleSheet, Text, View, ViewStyle, StyleProp, LayoutChangeEvent,
+  Animated, Easing, ImageSourcePropType, PanResponder, Pressable, StyleSheet, Text, View, ViewStyle, StyleProp, LayoutChangeEvent,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,45 +14,78 @@ export const tap = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).
 export const thud = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
 export const success = () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
 
-// ---------- Арын дэвсгэр: градиент + хазайлтаар хөдөлдөг гэрэл ----------
-export function Background({ children }: { children: React.ReactNode }) {
+// ---------- Арын дэвсгэр: жинхэнэ зураг + хазайлтаар хөдөлдөг parallax + зураг солигдоход crossfade ----------
+export function Background({ children, image, dim = 0.6 }: { children: React.ReactNode; image?: ImageSourcePropType; dim?: number }) {
   const { theme } = useTheme();
   const tilt = useTilt();
-  // Утсыг хазайлгахад 2 гэрэл эсрэг чиглэлд хөдөлж гүн мэдрэмж (parallax) өгнө
-  const move = (k: number) => ({
+  // Өмнөх зураг дээр шинэ зураг аажмаар тодорч ирнэ (crossfade)
+  const [layers, setLayers] = useState<{ key: number; src: ImageSourcePropType }[]>(image ? [{ key: 0, src: image }] : []);
+  const fade = useRef(new Animated.Value(1)).current;
+  const keyRef = useRef(0);
+  useEffect(() => {
+    if (!image || layers[layers.length - 1]?.src === image) return;
+    keyRef.current += 1;
+    setLayers((l) => [...l.slice(-1), { key: keyRef.current, src: image }]);
+    fade.setValue(0);
+    Animated.timing(fade, { toValue: 1, duration: 650, easing: Easing.out(Easing.quad), useNativeDriver: true }).start(() =>
+      setLayers((l) => l.slice(-1)),
+    );
+  }, [image]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Утсыг хазайлгахад зураг бага зэрэг хөдөлж гүний мэдрэмж (parallax) өгнө
+  const parallax = {
     transform: [
-      { translateX: tilt.x.interpolate({ inputRange: [-1, 1], outputRange: [-40 * k, 40 * k] }) },
-      { translateY: tilt.y.interpolate({ inputRange: [-1, 1], outputRange: [40 * k, -40 * k] }) },
+      { scale: 1.15 },
+      { translateX: tilt.x.interpolate({ inputRange: [-1, 1], outputRange: [-22, 22] }) },
+      { translateY: tilt.y.interpolate({ inputRange: [-1, 1], outputRange: [22, -22] }) },
     ],
-  });
+  };
+  // Зургийн дээрх бараан/цайвар бүрхүүл — текст уншигдахуйц байлгана
+  const veil = theme.dark
+    ? [`rgba(12,12,14,${dim - 0.3})`, `rgba(14,14,16,${dim})`, theme.bgBottom]
+    : [`rgba(246,246,247,${dim - 0.15})`, `rgba(236,236,239,${dim + 0.12})`, theme.bgBottom];
+
   return (
-    <LinearGradient colors={[theme.bgTop, theme.bgBottom]} style={StyleSheet.absoluteFill}>
-      <Animated.View style={[styles.glowBox, { top: -200, right: -200 }, move(1)]} pointerEvents="none">
-        <SoftGlow color={theme.accent} strength={theme.dark ? 0.07 : 0.06} />
-      </Animated.View>
-      <Animated.View style={[styles.glowBox, { bottom: -220, left: -220 }, move(-0.6)]} pointerEvents="none">
-        <SoftGlow color={theme.dark ? '#8A8A99' : '#FFFFFF'} strength={theme.dark ? 0.04 : 0.12} />
-      </Animated.View>
+    <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.bgBottom }]}>
+      {layers.map((l, i) => (
+        <Animated.Image
+          key={l.key}
+          source={l.src}
+          resizeMode="cover"
+          style={[StyleSheet.absoluteFill, parallax, { opacity: i === layers.length - 1 && layers.length > 1 ? fade : 1 }]}
+        />
+      ))}
+      {!image && <LinearGradient colors={[theme.bgTop, theme.bgBottom]} style={StyleSheet.absoluteFill} />}
+      <LinearGradient colors={veil as [string, string, string]} locations={[0, 0.6, 1]} style={StyleSheet.absoluteFill} />
       {children}
-    </LinearGradient>
+    </View>
   );
 }
 
-// Олон тунгалаг тойргийг давхарлаж "blur" гэрэл үүсгэнэ (бүх платформ дээр ажиллана)
-function SoftGlow({ color, strength }: { color: string; strength: number }) {
+// ---------- Reveal: дэлгэц нээгдэхэд блокууд дараалан доороос гарч ирнэ (stagger) ----------
+export function Reveal({ children, i = 0 }: { children: React.ReactNode; i?: number }) {
+  const v = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(v, { toValue: 1, duration: 480, delay: 60 + i * 70, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+  }, [v, i]);
   return (
-    <>
-      {Array.from({ length: 16 }, (_, i) => 1 - i * 0.055).map((k) => (
-        <View
-          key={k}
-          style={{
-            position: 'absolute', width: 480 * k, height: 480 * k, borderRadius: 240 * k,
-            left: 240 - 240 * k, top: 240 - 240 * k, backgroundColor: color, opacity: strength * 0.4,
-          }}
-        />
-      ))}
-    </>
+    <Animated.View
+      style={{
+        opacity: v,
+        transform: [
+          { translateY: v.interpolate({ inputRange: [0, 1], outputRange: [28, 0] }) },
+          { scale: v.interpolate({ inputRange: [0, 1], outputRange: [0.97, 1] }) },
+        ],
+      }}
+    >
+      {children}
+    </Animated.View>
   );
+}
+
+// Stagger: дотор нь байгаа блок бүрийг Reveal-ээр ороож дараалан гаргана
+export function Stagger({ children }: { children: React.ReactNode }) {
+  return <View>{React.Children.toArray(children).map((c, i) => <Reveal key={i} i={i}>{c}</Reveal>)}</View>;
 }
 
 // ---------- Шилэн карт ----------
@@ -259,7 +292,6 @@ export function SectionTitle({ kicker, title }: { kicker: string; title: string 
 }
 
 const styles = StyleSheet.create({
-  glowBox: { position: 'absolute', width: 480, height: 480 },
   glass: { borderRadius: 26, borderWidth: 1, padding: 18, overflow: 'hidden' },
   pill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, borderWidth: 1, alignSelf: 'flex-start' },
   dot: { width: 7, height: 7, borderRadius: 4, marginRight: 6 },
