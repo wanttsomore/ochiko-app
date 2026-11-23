@@ -1,6 +1,6 @@
 // Түвшин бүрт нээгдэх самбарууд (доороос гарч ирэх цонх).
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Alert, Animated, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Glass, IconCircle, Pill, T } from '../components/ui';
 import { useTheme } from '../theme';
@@ -51,6 +51,18 @@ export default function StationSheet({ level, index, onClose, onPlay, onRestart 
   );
 }
 
+// ---------- CV татах ----------
+// CV бэлэн болмогц вэб сайтын public/cv.pdf-д байршуулахад энэ товч шууд нээнэ.
+const CV_URL = 'https://scintillating-platypus-35f542.netlify.app/cv.pdf';
+async function openCv() {
+  try {
+    const r = await fetch(CV_URL, { method: 'HEAD' });
+    const type = r.headers.get('content-type') || '';
+    if (r.ok && type.includes('pdf')) { await Linking.openURL(CV_URL); return; }
+  } catch { /* сүлжээгүй үед */ }
+  Alert.alert('CV', 'CV удахгүй нэмэгдэнэ.');
+}
+
 // ---------- Lv1: Танилцуулга ----------
 function StartPanel() {
   const { theme } = useTheme();
@@ -69,6 +81,7 @@ function StartPanel() {
         <Info icon="briefcase-outline" text={`Мэргэжил: ${profile.major}`} />
         <Info icon="id-card-outline" text={`Оюутны код: ${profile.studentId}`} />
       </Glass>
+      <Button label="CV татах" icon="download-outline" kind="ghost" onPress={openCv} style={{ marginTop: 14 }} />
       <T size={13} weight="700" style={{ marginTop: 20, marginBottom: 10 }}>ХЭРХЭН ТОГЛОХ ВЭ</T>
       <Glass style={{ gap: 12 }}>
         <Info icon="chevron-forward-circle-outline" text="Сум товчийг дарж байх хооронд морь давхина. Утсаа хазайлгаж ч удирдаж болно." />
